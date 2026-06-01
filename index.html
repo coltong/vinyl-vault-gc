@@ -50,7 +50,7 @@ header p{font-size:12px;opacity:0.6;margin-top:2px}
 .form-group input,.form-group select{padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px}
 .submit-btn{width:100%;padding:14px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
 .loading{text-align:center;padding:40px;color:#888}
-.error{text-align:center;padding:40px;color:#dc2626}
+.error{text-align:center;padding:40px;color:#dc2626;font-size:14px}
 .empty{text-align:center;padding:40px;color:#888;font-size:15px}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #eee;display:flex;z-index:100}
 .nav-btn{flex:1;padding:12px;text-align:center;font-size:12px;font-weight:600;color:#888;cursor:pointer;border:none;background:none}
@@ -74,33 +74,25 @@ main{padding-bottom:70px}
     <div class="stat"><div class="stat-num" id="want-count">-</div><div class="stat-label">Want</div></div>
     <div class="stat"><div class="stat-num" id="total-count">-</div><div class="stat-label">Total</div></div>
   </div>
-
   <div class="tab-bar">
     <div class="tab active" id="tab-owned" onclick="switchTab('owned')">My Collection</div>
     <div class="tab" id="tab-want" onclick="switchTab('want')">Want List</div>
     <div class="tab" id="tab-add" onclick="switchTab('add')">+ Add</div>
   </div>
-
   <div id="section-owned">
     <div class="controls">
       <input class="search" id="search-owned" placeholder="Search artist or album..." oninput="renderOwned()">
       <div class="filters" id="filters-owned"></div>
     </div>
-    <div class="records" id="records-owned">
-      <div class="loading">Loading your collection...</div>
-    </div>
+    <div class="records" id="records-owned"><div class="loading">Loading your collection...</div></div>
   </div>
-
   <div id="section-want" style="display:none">
     <div class="controls">
       <input class="search" id="search-want" placeholder="Search want list..." oninput="renderWant()">
       <div class="filters" id="filters-want"></div>
     </div>
-    <div class="records" id="records-want">
-      <div class="loading">Loading want list...</div>
-    </div>
+    <div class="records" id="records-want"><div class="loading">Loading want list...</div></div>
   </div>
-
   <div id="section-add" style="display:none" class="add-section">
     <div class="add-card">
       <h3>Add a Record</h3>
@@ -123,13 +115,11 @@ main{padding-bottom:70px}
     </div>
   </div>
 </main>
-
 <div class="toast" id="toast"></div>
-
 <script>
 const SHEET_ID = '1IpetK_EynQ5HLbjcEoQi_ewlkRnEi9UX__JIvw_ugZM';
 const SHEET_NAME = 'Collection_Master';
-const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&sheet=' + encodeURIComponent(SHEET_NAME);
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqJRWPH8KtfXrRuXxplr0IKAhI-pQos6nS56uIS9k/exec';
 
 let allRecords = [];
@@ -141,21 +131,23 @@ async function fetchSheet() {
     const res = await fetch(CSV_URL);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const text = await res.text();
-    if (!text || text.trim().startsWith('<!')) throw new Error('Got HTML not CSV — sheet may not be public');
+    if (!text || text.trim().startsWith('<!')) throw new Error('Got HTML not CSV');
     return parseCSV(text);
   } catch(e) {
-    console.error('Sheet fetch error:', e.message);
+    console.error('fetchSheet error:', e.message);
     return null;
   }
 }
 
 function parseCSV(text) {
-  const lines = text.trim().split('\n');
+  const lines = text.trim().replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
   const headers = parseCSVLine(lines[0]);
-  return lines.slice(1).map(line => {
+  return lines.slice(1).filter(l => l.trim()).map(line => {
     const vals = parseCSVLine(line);
     const obj = {};
-    headers.forEach((h,i) => obj[h.trim().replace(/^"|"$/g,'')] = (vals[i]||'').replace(/^"|"$/g,''));
+    headers.forEach((h, i) => {
+      obj[h.trim().replace(/^"|"$/g, '')] = (vals[i] || '').replace(/^"|"$/g, '');
+    });
     return obj;
   }).filter(r => r.Artist && r.Album);
 }
@@ -178,11 +170,11 @@ function parseCSVLine(line) {
 
 async function getCoverArt(artist, album) {
   try {
-    const q = encodeURIComponent(`${artist} ${album}`);
-    const res = await fetch(`https://itunes.apple.com/search?term=${q}&entity=album&limit=1`);
+    const q = encodeURIComponent(artist + ' ' + album);
+    const res = await fetch('https://itunes.apple.com/search?term=' + q + '&entity=album&limit=1');
     const data = await res.json();
     if (data.results && data.results[0]) {
-      return data.results[0].artworkUrl100.replace('100x100bb','500x500bb');
+      return data.results[0].artworkUrl100.replace('100x100bb', '500x500bb');
     }
   } catch(e) {}
   return null;
@@ -194,8 +186,9 @@ function makeLanes(records) {
 
 function buildFilters(containerId, lanes, type) {
   const el = document.getElementById(containerId);
+  if (!el) return;
   el.innerHTML = lanes.map(l =>
-    `<button class="filter-btn ${activeFilter[type]===l?'active':''}" onclick="setFilter('${type}','${l}')">${l}</button>`
+    '<button class="filter-btn ' + (activeFilter[type] === l ? 'active' : '') + '" onclick="setFilter(\'' + type + '\',\'' + l.replace(/'/g, "\\'") + '\')">' + l + '</button>'
   ).join('');
 }
 
@@ -207,15 +200,10 @@ function setFilter(type, val) {
 
 function switchTab(tab) {
   currentTab = tab;
-  ['owned','want','add'].forEach(t => {
+  ['owned', 'want', 'add'].forEach(t => {
     document.getElementById('section-' + t).style.display = t === tab ? '' : 'none';
     document.getElementById('tab-' + t).classList.toggle('active', t === tab);
   });
 }
 
-function updateStats() {
-  const owned = allRecords.filter(r => r.Status === 'Owned').length;
-  const want = allRecords.filter(r => r.Status === 'Want').length;
-  document.getElementById('owned-count').textContent = owned;
-  document.getElementById('want-count').textContent = want;
-  document.getElementById('total-count
+function
