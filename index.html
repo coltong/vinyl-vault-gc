@@ -3,203 +3,166 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#17120f">
+<meta name="theme-color" content="#111317">
 <title>Vinyl Vault</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Hanken+Grotesque:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  // set theme before paint to avoid a flash
+  (function(){
+    var t = null;
+    try { t = localStorage.getItem("vv-theme"); } catch(e){}
+    if(!t) t = (window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
 <style>
+  html[data-theme="dark"]{
+    --bg:#111317; --bg-2:#171a1f; --panel:#1c2026; --panel-2:#232830;
+    --line:#2c323b; --text:#ecebe6; --text-dim:#a6adb5; --muted:#717981;
+    --disc:#0c0d10; --groove:rgba(255,255,255,.07); --card-shadow:0 18px 40px -20px rgba(0,0,0,.75);
+  }
+  html[data-theme="light"]{
+    --bg:#f3f1ea; --bg-2:#eae7dd; --panel:#ffffff; --panel-2:#f7f5ef;
+    --line:#e3ded2; --text:#1b1d20; --text-dim:#5d626a; --muted:#9197a0;
+    --disc:#15161a; --groove:rgba(255,255,255,.10); --card-shadow:0 16px 34px -22px rgba(40,38,30,.45);
+  }
   :root{
-    --bg:#17120f;
-    --bg-2:#1f1813;
-    --panel:#241c16;
-    --panel-2:#2c221a;
-    --line:#3a2d23;
-    --cream:#f3e9d8;
-    --cream-dim:#b6a690;
-    --muted:#7d6f5e;
-    --amber:#e8923f;
-    --amber-soft:#f2b873;
-    --teal:#5fb6a3;
-    --rose:#e0635f;
-    --gold:#d9b066;
-    --grain:rgba(243,233,216,.025);
+    --accent:#15a89a; --accent-soft:#5fd0c4;
+    --owned:#15a89a; --want:#e0654f; --total:#7b86d6;
+    --rose:#e0654f; --slate:#6f9ab5; --family:#a98bd9; --brass:#c79a4a;
     --radius:18px;
-    --shadow:0 18px 40px -18px rgba(0,0,0,.7);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--bg);
-    color:var(--cream);
-    font-family:"Hanken Grotesque",sans-serif;
-    -webkit-font-smoothing:antialiased;
-    min-height:100vh;
-    position:relative;
-    overflow-x:hidden;
+    background:var(--bg); color:var(--text);
+    font-family:"Hanken Grotesque",sans-serif; -webkit-font-smoothing:antialiased;
+    min-height:100vh; position:relative; overflow-x:hidden; transition:background .35s ease,color .35s ease;
   }
-  /* atmosphere */
   body::before{
-    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.9;
     background:
-      radial-gradient(120% 80% at 85% -10%, rgba(232,146,63,.16), transparent 55%),
-      radial-gradient(90% 70% at -10% 110%, rgba(95,182,163,.10), transparent 55%);
-  }
-  body::after{
-    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
-    mix-blend-mode:overlay;
+      radial-gradient(120% 80% at 88% -12%, color-mix(in srgb,var(--accent) 16%,transparent), transparent 55%),
+      radial-gradient(90% 70% at -12% 112%, color-mix(in srgb,var(--total) 14%,transparent), transparent 55%);
   }
   .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 18px 120px;}
 
-  /* ---------- header ---------- */
-  header{padding:26px 2px 16px;}
+  /* header */
+  header{padding:24px 2px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
   .brand{display:flex;align-items:center;gap:14px;}
-  .disc{
-    width:46px;height:46px;border-radius:50%;flex:0 0 auto;
-    background:
-      radial-gradient(circle at center,#0c0907 0 18%, #2a201a 18% 21%, #15100c 21% 32%, #2a201a 32% 35%, #15100c 35% 47%, #2a201a 47% 50%, #15100c 50% 100%);
-    box-shadow:0 6px 14px rgba(0,0,0,.5), inset 0 0 0 1px rgba(243,233,216,.06);
-    position:relative;
-    animation:spin 7s linear infinite;
-  }
-  .disc::after{content:"";position:absolute;inset:0;margin:auto;width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 3px #0c0907;}
+  .brand-disc{width:52px;height:52px;flex:0 0 auto;animation:spin 8s linear infinite;filter:drop-shadow(0 6px 12px rgba(0,0,0,.4));}
   @keyframes spin{to{transform:rotate(360deg);}}
-  h1{
-    font-family:"Fraunces",serif;font-weight:900;font-size:34px;line-height:.95;margin:0;
-    letter-spacing:-.5px;
+  h1{font-family:"Fraunces",serif;font-weight:900;font-size:33px;line-height:.95;margin:0;letter-spacing:-.5px;}
+  h1 em{font-style:italic;font-weight:500;color:var(--accent);}
+  .tagline{font-size:12px;color:var(--muted);letter-spacing:.6px;margin-top:3px;text-transform:uppercase;}
+  .theme-btn{
+    flex:0 0 auto;width:40px;height:40px;border-radius:11px;border:1px solid var(--line);
+    background:var(--panel);color:var(--text);cursor:pointer;display:grid;place-items:center;transition:.2s;
   }
-  h1 em{font-style:italic;font-weight:500;color:var(--amber-soft);}
-  .tagline{font-size:12.5px;color:var(--muted);letter-spacing:.5px;margin-top:3px;text-transform:uppercase;}
+  .theme-btn:active{transform:scale(.94);}
+  .theme-btn svg{width:19px;height:19px;}
 
-  /* ---------- stats ---------- */
-  .stats{display:flex;gap:10px;margin-top:22px;}
-  .stat{
-    flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;
-    padding:13px 12px;text-align:center;position:relative;overflow:hidden;
-  }
+  /* stats */
+  .stats{display:flex;gap:10px;margin-top:20px;}
+  .stat{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 12px;text-align:center;}
   .stat .n{font-family:"Fraunces",serif;font-weight:900;font-size:26px;line-height:1;display:block;}
-  .stat .l{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream-dim);margin-top:5px;}
-  .stat.owned .n{color:var(--teal);}
-  .stat.want .n{color:var(--amber);}
-  .stat.total .n{color:var(--gold);}
+  .stat .l{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-dim);margin-top:5px;}
+  .stat.owned .n{color:var(--owned);}
+  .stat.want .n{color:var(--want);}
+  .stat.total .n{color:var(--total);}
 
-  /* ---------- tabs ---------- */
-  .tabs{display:flex;gap:6px;margin-top:24px;background:var(--bg-2);padding:5px;border-radius:14px;border:1px solid var(--line);}
-  .tab{
-    flex:1;border:none;background:transparent;color:var(--cream-dim);
-    font-family:"Hanken Grotesque",sans-serif;font-weight:600;font-size:13.5px;
-    padding:11px 6px;border-radius:10px;cursor:pointer;transition:.2s;letter-spacing:.2px;
-  }
-  .tab.active{background:var(--amber);color:#1a120b;box-shadow:0 6px 16px -6px rgba(232,146,63,.6);}
+  /* tabs */
+  .tabs{display:flex;gap:6px;margin-top:22px;background:var(--bg-2);padding:5px;border-radius:14px;border:1px solid var(--line);}
+  .tab{flex:1;border:none;background:transparent;color:var(--text-dim);font-family:"Hanken Grotesque",sans-serif;font-weight:600;font-size:13.5px;padding:11px 6px;border-radius:10px;cursor:pointer;transition:.2s;}
+  .tab.active{background:var(--accent);color:#fff;box-shadow:0 6px 16px -6px color-mix(in srgb,var(--accent) 70%,transparent);}
   .tab:not(.active):active{background:var(--panel);}
 
-  /* ---------- controls ---------- */
+  /* controls */
   .controls{margin-top:18px;}
   .search{position:relative;}
-  .search input{
-    width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;
-    color:var(--cream);font-family:inherit;font-size:15px;padding:13px 14px 13px 42px;
-    outline:none;transition:.2s;
-  }
+  .search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:inherit;font-size:15px;padding:13px 14px 13px 42px;outline:none;transition:.2s;}
   .search input::placeholder{color:var(--muted);}
-  .search input:focus{border-color:var(--amber);background:var(--panel-2);}
+  .search input:focus{border-color:var(--accent);}
   .search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);stroke:var(--muted);}
-  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px;}
-  .chip{
-    background:var(--panel);border:1px solid var(--line);color:var(--cream-dim);
-    font-family:inherit;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;
-    cursor:pointer;transition:.18s;white-space:nowrap;
-  }
-  .chip.active{background:var(--cream);color:#1a120b;border-color:var(--cream);}
+  .filter-group{margin-top:13px;}
+  .filter-label{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 7px 2px;}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{background:var(--panel);border:1px solid var(--line);color:var(--text-dim);font-family:inherit;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;transition:.18s;white-space:nowrap;}
+  .chip.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+  .chip.fam.active{background:var(--family);color:#fff;border-color:var(--family);}
   .chip:not(.active):active{transform:scale(.96);}
 
-  /* ---------- records ---------- */
+  /* records */
   .grid{margin-top:20px;display:flex;flex-direction:column;gap:12px;}
-  .card{
-    background:linear-gradient(180deg,var(--panel) 0,var(--bg-2) 100%);
-    border:1px solid var(--line);border-radius:var(--radius);padding:16px 16px 14px;
-    display:flex;gap:15px;align-items:flex-start;box-shadow:var(--shadow);
-    animation:rise .45s cubic-bezier(.2,.7,.2,1) backwards;
-  }
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;gap:14px;align-items:flex-start;box-shadow:var(--card-shadow);animation:rise .45s cubic-bezier(.2,.7,.2,1) backwards;}
   @keyframes rise{from{opacity:0;transform:translateY(10px);}}
-  .sleeve{
-    flex:0 0 auto;width:48px;height:48px;border-radius:50%;margin-top:3px;
-    background:radial-gradient(circle at center,#0c0907 0 16%, #241b15 16% 19%, #120d09 19% 30%, #241b15 30% 33%, #120d09 33% 100%);
-    box-shadow:inset 0 0 0 1px rgba(243,233,216,.05);position:relative;
-  }
-  .sleeve::after{content:"";position:absolute;inset:0;margin:auto;width:14px;height:14px;border-radius:50%;}
-  .sleeve.owned::after{background:var(--teal);}
-  .sleeve.want::after{background:var(--amber);}
+  .art{flex:0 0 auto;width:60px;height:60px;border-radius:10px;overflow:hidden;position:relative;background:var(--disc);display:grid;place-items:center;}
+  .art svg{width:100%;height:100%;}
+  .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s ease;}
+  .art img.in{opacity:1;}
   .card .body{flex:1;min-width:0;}
-  .card .artist{font-size:11.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--amber-soft);font-weight:700;}
-  .card .album{font-family:"Fraunces",serif;font-weight:600;font-size:19px;line-height:1.15;margin:2px 0 0;word-wrap:break-word;}
-  .card .notes{font-size:13px;color:var(--cream-dim);margin-top:6px;line-height:1.4;}
-  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
-  .tag{font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:4px 9px;border-radius:7px;text-transform:uppercase;}
-  .tag.genre{background:rgba(243,233,216,.08);color:var(--cream-dim);border:1px solid var(--line);}
-  .tag.source{background:rgba(217,176,102,.12);color:var(--gold);border:1px solid rgba(217,176,102,.25);}
-  .tag.status-owned{background:rgba(95,182,163,.14);color:var(--teal);border:1px solid rgba(95,182,163,.3);}
-  .tag.status-want{background:rgba(232,146,63,.14);color:var(--amber-soft);border:1px solid rgba(232,146,63,.3);}
-  .tag.pri-high{background:rgba(224,99,95,.15);color:var(--rose);border:1px solid rgba(224,99,95,.3);}
-  .tag.pri-medium{background:rgba(217,176,102,.12);color:var(--gold);border:1px solid rgba(217,176,102,.25);}
-  .tag.pri-low{background:rgba(125,111,94,.15);color:var(--cream-dim);border:1px solid var(--line);}
+  .card .artist{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--accent);font-weight:700;}
+  .card .album{font-family:"Fraunces",serif;font-weight:600;font-size:18px;line-height:1.15;margin:2px 0 0;word-wrap:break-word;}
+  .card .notes{font-size:12.5px;color:var(--text-dim);margin-top:5px;line-height:1.4;}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+  .tag{font-size:10px;font-weight:700;letter-spacing:.5px;padding:4px 9px;border-radius:7px;text-transform:uppercase;border:1px solid;}
+  .tag.genre{background:color-mix(in srgb,var(--text) 7%,transparent);color:var(--text-dim);border-color:var(--line);}
+  .tag.source{background:color-mix(in srgb,var(--accent) 13%,transparent);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 32%,transparent);}
+  .tag.fam{background:color-mix(in srgb,var(--family) 16%,transparent);color:var(--family);border-color:color-mix(in srgb,var(--family) 38%,transparent);}
+  .tag.status-owned{background:color-mix(in srgb,var(--owned) 14%,transparent);color:var(--owned);border-color:color-mix(in srgb,var(--owned) 32%,transparent);}
+  .tag.status-want{background:color-mix(in srgb,var(--want) 14%,transparent);color:var(--want);border-color:color-mix(in srgb,var(--want) 32%,transparent);}
+  .tag.pri-high{background:color-mix(in srgb,var(--rose) 14%,transparent);color:var(--rose);border-color:color-mix(in srgb,var(--rose) 32%,transparent);}
+  .tag.pri-medium{background:color-mix(in srgb,var(--slate) 16%,transparent);color:var(--slate);border-color:color-mix(in srgb,var(--slate) 34%,transparent);}
+  .tag.pri-low{background:color-mix(in srgb,var(--text) 7%,transparent);color:var(--text-dim);border-color:var(--line);}
 
-  /* ---------- states ---------- */
-  .state{text-align:center;padding:64px 20px;color:var(--cream-dim);}
-  .state .spinner{
-    width:54px;height:54px;border-radius:50%;margin:0 auto 20px;
-    background:radial-gradient(circle at center,#0c0907 0 16%, #2a201a 16% 19%, #15100c 19% 30%, #2a201a 30% 33%, #15100c 33% 100%);
-    animation:spin 1.4s linear infinite;box-shadow:inset 0 0 0 1px rgba(243,233,216,.06);position:relative;
-  }
-  .state .spinner::after{content:"";position:absolute;inset:0;margin:auto;width:8px;height:8px;border-radius:50%;background:var(--amber);}
-  .state.error{color:var(--rose);}
-  .state .big{font-family:"Fraunces",serif;font-size:20px;color:var(--cream);margin-bottom:8px;}
-  .state .retry{margin-top:18px;background:var(--amber);color:#1a120b;border:none;font-family:inherit;font-weight:700;font-size:14px;padding:11px 22px;border-radius:11px;cursor:pointer;}
-  .state code{background:var(--panel);padding:2px 6px;border-radius:5px;font-size:11px;color:var(--cream-dim);word-break:break-all;}
+  /* states */
+  .state{text-align:center;padding:60px 20px;color:var(--text-dim);}
+  .state .spinner{width:50px;height:50px;margin:0 auto 18px;animation:spin 1.4s linear infinite;}
+  .state.error{color:var(--want);}
+  .state .big{font-family:"Fraunces",serif;font-size:20px;color:var(--text);margin-bottom:8px;}
+  .state .retry{margin-top:18px;background:var(--accent);color:#fff;border:none;font-family:inherit;font-weight:700;font-size:14px;padding:11px 22px;border-radius:11px;cursor:pointer;}
+  .state code{background:var(--panel);padding:2px 6px;border-radius:5px;font-size:11px;color:var(--text-dim);word-break:break-all;}
 
-  /* ---------- add form ---------- */
-  form{margin-top:22px;display:flex;flex-direction:column;gap:15px;}
-  .field label{display:block;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--cream-dim);font-weight:700;margin-bottom:7px;}
-  .field input,.field select,.field textarea{
-    width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;
-    color:var(--cream);font-family:inherit;font-size:15px;padding:13px 14px;outline:none;transition:.2s;
-  }
-  .field textarea{resize:vertical;min-height:70px;}
-  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--amber);background:var(--panel-2);}
-  .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23b6a690' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
+  /* add form */
+  form{margin-top:22px;display:flex;flex-direction:column;gap:14px;}
+  .field label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:7px;}
+  .field input,.field select,.field textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:inherit;font-size:15px;padding:13px 14px;outline:none;transition:.2s;}
+  .field textarea{resize:vertical;min-height:64px;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+  .field .hint{font-size:11px;color:var(--muted);margin-top:6px;font-weight:500;letter-spacing:0;text-transform:none;}
+  .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%239197a0' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
   .row2{display:flex;gap:12px;}
   .row2 .field{flex:1;}
-  .submit{
-    background:var(--amber);color:#1a120b;border:none;font-family:"Hanken Grotesque",sans-serif;
-    font-weight:700;font-size:15.5px;padding:15px;border-radius:13px;cursor:pointer;margin-top:4px;
-    transition:.2s;box-shadow:0 10px 24px -10px rgba(232,146,63,.7);
-  }
+  .submit{background:var(--accent);color:#fff;border:none;font-family:"Hanken Grotesque",sans-serif;font-weight:700;font-size:15.5px;padding:15px;border-radius:13px;cursor:pointer;margin-top:4px;transition:.2s;box-shadow:0 10px 24px -12px color-mix(in srgb,var(--accent) 80%,transparent);}
   .submit:active{transform:scale(.985);}
   .submit:disabled{opacity:.6;cursor:default;}
-  .formmsg{text-align:center;font-size:14px;padding:6px;border-radius:10px;display:none;}
-  .formmsg.ok{display:block;background:rgba(95,182,163,.14);color:var(--teal);}
-  .formmsg.err{display:block;background:rgba(224,99,95,.14);color:var(--rose);}
+  .formmsg{text-align:center;font-size:14px;padding:8px;border-radius:10px;display:none;}
+  .formmsg.ok{display:block;background:color-mix(in srgb,var(--owned) 16%,transparent);color:var(--owned);}
+  .formmsg.err{display:block;background:color-mix(in srgb,var(--want) 16%,transparent);color:var(--want);}
   .hidden{display:none!important;}
-  .count{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;letter-spacing:.5px;}
+  .count{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;letter-spacing:.4px;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="brand">
-      <div class="disc"></div>
+      <span class="brand-disc" id="brand-disc"></span>
       <div>
         <h1>Vinyl <em>Vault</em></h1>
         <div class="tagline">Crate-digging, catalogued</div>
       </div>
     </div>
-    <div class="stats">
-      <div class="stat owned"><span class="n" id="stat-owned">—</span><span class="l">Owned</span></div>
-      <div class="stat want"><span class="n" id="stat-want">—</span><span class="l">Want</span></div>
-      <div class="stat total"><span class="n" id="stat-total">—</span><span class="l">Total</span></div>
-    </div>
+    <button class="theme-btn" id="theme-btn" title="Toggle light / dark" aria-label="Toggle theme"></button>
   </header>
+
+  <div class="stats">
+    <div class="stat owned"><span class="n" id="stat-owned">—</span><span class="l">Owned</span></div>
+    <div class="stat want"><span class="n" id="stat-want">—</span><span class="l">Want</span></div>
+    <div class="stat total"><span class="n" id="stat-total">—</span><span class="l">Total</span></div>
+  </div>
 
   <nav class="tabs">
     <button class="tab active" data-tab="owned">My Collection</button>
@@ -207,55 +170,42 @@
     <button class="tab" data-tab="add">+ Add</button>
   </nav>
 
-  <!-- COLLECTION / WANT controls -->
   <div class="controls" id="browse-controls">
     <div class="search">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       <input id="search" type="text" placeholder="Search artist or album…">
     </div>
-    <div class="filters" id="filters"></div>
+    <div class="filter-group">
+      <p class="filter-label">Source list</p>
+      <div class="filters" id="filters-source"></div>
+    </div>
+    <div class="filter-group hidden" id="family-group">
+      <p class="filter-label">For</p>
+      <div class="filters" id="filters-family"></div>
+    </div>
   </div>
 
-  <!-- OWNED PANEL -->
   <section id="panel-owned">
     <div class="grid" id="records-owned"></div>
     <div class="count" id="count-owned"></div>
   </section>
 
-  <!-- WANT PANEL -->
   <section id="panel-want" class="hidden">
     <div class="grid" id="records-want"></div>
     <div class="count" id="count-want"></div>
   </section>
 
-  <!-- ADD PANEL -->
   <section id="panel-add" class="hidden">
     <form id="add-form" autocomplete="off">
       <div class="formmsg" id="form-msg"></div>
-      <div class="field">
-        <label for="f-artist">Artist</label>
-        <input id="f-artist" type="text" required placeholder="e.g. J Dilla">
-      </div>
-      <div class="field">
-        <label for="f-album">Album</label>
-        <input id="f-album" type="text" required placeholder="e.g. Donuts">
-      </div>
+      <div class="field"><label for="f-artist">Artist</label><input id="f-artist" type="text" required placeholder="e.g. J Dilla"></div>
+      <div class="field"><label for="f-album">Album</label><input id="f-album" type="text" required placeholder="e.g. Donuts"></div>
       <div class="row2">
-        <div class="field">
-          <label for="f-status">Status</label>
-          <select id="f-status"><option value="Owned">Owned</option><option value="Want">Want</option></select>
-        </div>
-        <div class="field">
-          <label for="f-priority">Priority</label>
-          <select id="f-priority"><option value="High">High</option><option value="Medium" selected>Medium</option><option value="Low">Low</option></select>
-        </div>
+        <div class="field"><label for="f-status">Status</label><select id="f-status"><option value="Owned">Owned</option><option value="Want">Want</option></select></div>
+        <div class="field"><label for="f-priority">Priority</label><select id="f-priority"><option value="High">High</option><option value="Medium" selected>Medium</option><option value="Low">Low</option></select></div>
       </div>
-      <div class="field">
-        <label for="f-genre">Genre</label>
-        <input id="f-genre" type="text" placeholder="e.g. Hip Hop">
-      </div>
-      <div class="field">
-        <label for="f-source">Source List</label>
+      <div class="field"><label for="f-genre">Genre</label><input id="f-genre" type="text" placeholder="e.g. Hip-Hop"></div>
+      <div class="field"><label for="f-source">Source List</label>
         <select id="f-source">
           <option value="Owned collection">Owned collection</option>
           <option value="Hip Hop Evolution">Hip Hop Evolution</option>
@@ -263,28 +213,47 @@
           <option value="LCD Losing My Edge">LCD Losing My Edge</option>
         </select>
       </div>
-      <div class="field">
-        <label for="f-notes">Notes</label>
-        <textarea id="f-notes" placeholder="Pressing, condition, why you want it…"></textarea>
+      <div class="field"><label for="f-for">For (family)</label>
+        <input id="f-for" type="text" list="family-list" placeholder="e.g. Susan">
+        <datalist id="family-list"><option value="Susan"><option value="Chloe"><option value="Amber"><option value="Faye"></datalist>
+        <p class="hint">Optional. Separate multiple names with commas.</p>
       </div>
+      <div class="field"><label for="f-notes">Notes</label><textarea id="f-notes" placeholder="Pressing, condition, why you want it…"></textarea></div>
       <button class="submit" id="submit-btn" type="submit">Add to Vault</button>
     </form>
   </section>
 </div>
 
 <script>
-// Collection_Master tab is gid 1619124955. The /export endpoint ignores &sheet=NAME
-// and falls back to the first tab, so the numeric gid is required.
-const CSV_URL   = "https://docs.google.com/spreadsheets/d/1IpetK_EynQ5HLbjcEoQi_ewlkRnEi9UX__JIvw_ugZM/export?format=csv&gid=1619124955";
-const SCRIPT_URL= "https://script.google.com/macros/s/AKfycbwqJRWPH8KtfXrRuXxplr0IKAhI-pQos6nS56uIS9k/exec";
-const SOURCE_OPTIONS = ["Owned collection","Hip Hop Evolution","Rick Rubin","LCD Losing My Edge"];
+const CSV_URL    = "https://docs.google.com/spreadsheets/d/1IpetK_EynQ5HLbjcEoQi_ewlkRnEi9UX__JIvw_ugZM/export?format=csv&gid=1619124955";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqJRWPH8KtfXrRuXxplr0IKAhI-pQos6nS56uIS9k/exec";
 
 let RECORDS = [];
-let currentTab = "owned";       // owned | want | add
+let FAMILY_KEY = null;            // detected "For" column name, if present
+let currentTab = "owned";
 let searchTerm = "";
 let sourceFilter = "All";
+let familyFilter = "All";
 
-/* ---------- robust CSV parser (handles quotes, commas, all line endings) ---------- */
+/* ---------- retro vinyl graphic ---------- */
+function vinyl(label){
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
+    + '<defs><radialGradient id="vg" cx="38%" cy="32%" r="75%">'
+    + '<stop offset="0%" stop-color="rgba(255,255,255,.18)"/><stop offset="22%" stop-color="rgba(255,255,255,0)"/>'
+    + '</radialGradient></defs>'
+    + '<circle cx="50" cy="50" r="49" fill="var(--disc)"/>'
+    + '<g fill="none" stroke="var(--groove)" stroke-width="1">'
+    + '<circle cx="50" cy="50" r="45"/><circle cx="50" cy="50" r="41"/><circle cx="50" cy="50" r="37"/>'
+    + '<circle cx="50" cy="50" r="33"/><circle cx="50" cy="50" r="29"/><circle cx="50" cy="50" r="25"/>'
+    + '</g>'
+    + '<circle cx="50" cy="50" r="16" fill="' + label + '"/>'
+    + '<circle cx="50" cy="50" r="16" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1"/>'
+    + '<circle cx="50" cy="50" r="2.4" fill="var(--disc)"/>'
+    + '<circle cx="50" cy="50" r="49" fill="url(#vg)"/>'
+    + '</svg>';
+}
+
+/* ---------- CSV parser (quotes, commas, all line endings, preamble rows) ---------- */
 function parseCSV(text){
   const norm = text.trim().replace(/\r\n/g,'\n').replace(/\r/g,'\n');
   const rows = [];
@@ -292,10 +261,8 @@ function parseCSV(text){
   for(let i=0;i<norm.length;i++){
     const c = norm[i];
     if(inQuotes){
-      if(c === '"'){
-        if(norm[i+1] === '"'){ field += '"'; i++; }
-        else inQuotes = false;
-      } else field += c;
+      if(c === '"'){ if(norm[i+1] === '"'){ field += '"'; i++; } else inQuotes = false; }
+      else field += c;
     } else {
       if(c === '"') inQuotes = true;
       else if(c === ',') { row.push(field); field=""; }
@@ -306,8 +273,6 @@ function parseCSV(text){
   row.push(field); rows.push(row);
   if(!rows.length) return [];
 
-  // The Collection_Master tab has title/description rows above the real header,
-  // so locate the header row dynamically instead of assuming it's row 0.
   const headerIdx = rows.findIndex(r => {
     const low = r.map(c => c.trim().toLowerCase());
     return low.includes("artist") && low.includes("album") && low.includes("status");
@@ -317,22 +282,19 @@ function parseCSV(text){
   const headers = rows[headerIdx].map(h => h.trim());
   return rows.slice(headerIdx + 1)
     .filter(r => r.some(c => c.trim() !== ""))
-    .map(r => {
-      const obj = {};
-      headers.forEach((h,idx) => { if(h) obj[h] = (r[idx] ?? "").trim(); }); // skip the empty leading column
-      return obj;
-    });
+    .map(r => { const o={}; headers.forEach((h,i)=>{ if(h) o[h]=(r[i] ?? "").trim(); }); return o; });
 }
 
 /* ---------- fetch ---------- */
 async function fetchSheet(){
   showLoading();
   try{
-    const res = await fetch(CSV_URL, { cache: "no-store" });
+    const res = await fetch(CSV_URL, { cache:"no-store" });
     if(!res.ok) throw new Error("HTTP " + res.status);
     const text = await res.text();
     if(/<html|<!doctype/i.test(text.slice(0,200))) throw new Error("Got an HTML page instead of CSV — check sheet sharing.");
     RECORDS = parseCSV(text);
+    FAMILY_KEY = RECORDS.length ? (Object.keys(RECORDS[0]).find(k => /^(for|family|recipient|gift for)$/i.test(k)) || null) : null;
     renderAll();
   }catch(err){
     showError(err.message || "Could not load data.");
@@ -342,43 +304,88 @@ async function fetchSheet(){
 /* ---------- helpers ---------- */
 const F = (rec,key) => (rec[key] || "").toString();
 const statusOf = rec => F(rec,"Status").toLowerCase();
-const isOwned  = rec => statusOf(rec).includes("own");
-const isWant   = rec => statusOf(rec).includes("want");
+const isOwned = rec => statusOf(rec).includes("own");
+const isWant  = rec => statusOf(rec).includes("want");
+const famNames = rec => FAMILY_KEY ? F(rec,FAMILY_KEY).split(",").map(s=>s.trim()).filter(Boolean) : [];
 function esc(s){ return (s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-/* ---------- render ---------- */
-function renderAll(){
-  renderStats();
-  renderFilters();
-  renderList("owned");
-  renderList("want");
+/* ---------- album art via iTunes (JSONP, cached, graceful fallback) ---------- */
+const artCache = {};
+function itunesLookup(term){
+  return new Promise(resolve => {
+    const cb = "itcb_" + Math.random().toString(36).slice(2);
+    const s = document.createElement("script");
+    let done = false;
+    const finish = (d) => { if(done) return; done = true; try{ delete window[cb]; }catch(e){} s.remove(); resolve(d); };
+    window[cb] = d => finish(d);
+    s.onerror = () => finish(null);
+    setTimeout(() => finish(null), 7000);
+    s.src = "https://itunes.apple.com/search?media=music&entity=album&limit=1&callback=" + cb + "&term=" + encodeURIComponent(term);
+    document.body.appendChild(s);
+  });
+}
+function fetchArt(term){
+  if(artCache[term]) return artCache[term];
+  artCache[term] = itunesLookup(term).then(d => {
+    const r = d && d.results && d.results[0];
+    return (r && r.artworkUrl100) ? r.artworkUrl100.replace("100x100","300x300") : null;
+  }).catch(() => null);
+  return artCache[term];
+}
+const artObserver = ("IntersectionObserver" in window) ? new IntersectionObserver((entries,obs) => {
+  entries.forEach(en => { if(en.isIntersecting){ obs.unobserve(en.target); loadArt(en.target); } });
+}, { rootMargin:"200px" }) : null;
+
+function loadArt(el){
+  const direct = el.getAttribute("data-img");
+  const term = el.getAttribute("data-term");
+  const apply = url => {
+    if(!url) return;
+    const img = document.createElement("img");
+    img.alt = "";
+    img.referrerPolicy = "no-referrer";
+    img.onload = () => img.classList.add("in");
+    img.onerror = () => img.remove();
+    img.src = url;
+    el.appendChild(img);
+  };
+  if(direct){ apply(direct); return; }
+  if(term) fetchArt(term).then(apply);
 }
 
+/* ---------- render ---------- */
+function renderAll(){ renderStats(); renderFilters(); renderList("owned"); renderList("want"); }
+
 function renderStats(){
-  const owned = RECORDS.filter(isOwned).length;
-  const want  = RECORDS.filter(isWant).length;
-  document.getElementById("stat-owned").textContent = owned;
-  document.getElementById("stat-want").textContent  = want;
+  document.getElementById("stat-owned").textContent = RECORDS.filter(isOwned).length;
+  document.getElementById("stat-want").textContent  = RECORDS.filter(isWant).length;
   document.getElementById("stat-total").textContent = RECORDS.length;
 }
 
+function chipRow(boxId, values, current, cls, onPick){
+  const box = document.getElementById(boxId);
+  box.innerHTML = values.map(v => '<button class="chip ' + cls + (v===current?' active':'') + '" data-v="' + esc(v) + '">' + esc(v) + '</button>').join("");
+  box.querySelectorAll(".chip").forEach(c => c.onclick = () => onPick(c.dataset.v));
+}
 function renderFilters(){
-  const found = new Set();
-  RECORDS.forEach(r => { const s = F(r,"Source List").trim(); if(s) found.add(s); });
-  const list = ["All", ...found];
-  const box = document.getElementById("filters");
-  box.innerHTML = list.map(s =>
-    `<button class="chip${s===sourceFilter?' active':''}" data-source="${esc(s)}">${esc(s)}</button>`
-  ).join("");
-  box.querySelectorAll(".chip").forEach(c => c.onclick = () => {
-    sourceFilter = c.dataset.source;
-    renderFilters();
-    renderList("owned"); renderList("want");
-  });
+  const sources = new Set();
+  RECORDS.forEach(r => { const s = F(r,"Source List").trim(); if(s) sources.add(s); });
+  chipRow("filters-source", ["All", ...sources], sourceFilter, "src", v => { sourceFilter=v; renderFilters(); renderList("owned"); renderList("want"); });
+
+  const fam = new Set();
+  RECORDS.forEach(r => famNames(r).forEach(n => fam.add(n)));
+  const famGroup = document.getElementById("family-group");
+  if(fam.size){
+    famGroup.classList.remove("hidden");
+    chipRow("filters-family", ["All", ...fam], familyFilter, "fam", v => { familyFilter=v; renderFilters(); renderList("owned"); renderList("want"); });
+  } else {
+    famGroup.classList.add("hidden");
+  }
 }
 
 function matches(rec){
   if(sourceFilter !== "All" && F(rec,"Source List").trim() !== sourceFilter) return false;
+  if(familyFilter !== "All" && !famNames(rec).includes(familyFilter)) return false;
   if(searchTerm){
     const hay = (F(rec,"Artist") + " " + F(rec,"Album")).toLowerCase();
     if(!hay.includes(searchTerm)) return false;
@@ -386,27 +393,29 @@ function matches(rec){
   return true;
 }
 
-function card(rec){
+function card(rec, i){
   const owned = isOwned(rec);
-  const genre = F(rec,"Genre");
-  const pri = F(rec,"Priority");
-  const src = F(rec,"Source List");
-  const notes = F(rec,"Notes");
-  const priClass = "pri-" + (pri.toLowerCase() || "low");
+  const genre = F(rec,"Genre"), pri = F(rec,"Priority"), src = F(rec,"Source List"), notes = F(rec,"Notes");
+  const labelColor = owned ? "var(--owned)" : "var(--want)";
   const tags = [];
-  if(genre) tags.push(`<span class="tag genre">${esc(genre)}</span>`);
-  if(pri)   tags.push(`<span class="tag ${priClass}">${esc(pri)}</span>`);
-  tags.push(`<span class="tag status-${owned?'owned':'want'}">${owned?'Owned':'Want'}</span>`);
-  if(src)   tags.push(`<span class="tag source">${esc(src)}</span>`);
-  return `<article class="card">
-    <div class="sleeve ${owned?'owned':'want'}"></div>
-    <div class="body">
-      <div class="artist">${esc(F(rec,"Artist")) || "Unknown Artist"}</div>
-      <h3 class="album">${esc(F(rec,"Album")) || "Untitled"}</h3>
-      ${notes ? `<div class="notes">${esc(notes)}</div>` : ""}
-      <div class="tags">${tags.join("")}</div>
-    </div>
-  </article>`;
+  if(genre) tags.push('<span class="tag genre">' + esc(genre) + '</span>');
+  if(pri)   tags.push('<span class="tag pri-' + (pri.toLowerCase()||"low") + '">' + esc(pri) + '</span>');
+  tags.push('<span class="tag status-' + (owned?'owned':'want') + '">' + (owned?'Owned':'Want') + '</span>');
+  if(src)   tags.push('<span class="tag source">' + esc(src) + '</span>');
+  famNames(rec).forEach(n => tags.push('<span class="tag fam">' + esc(n) + '</span>'));
+
+  const directImg = F(rec,"Image URL").trim();
+  const term = (F(rec,"Artist") + " " + F(rec,"Album")).trim();
+  const artAttrs = directImg ? ('data-img="' + esc(directImg) + '"') : ('data-term="' + esc(term) + '"');
+
+  return '<article class="card" style="animation-delay:' + Math.min(i*40,400) + 'ms">'
+    + '<div class="art" ' + artAttrs + '>' + vinyl(labelColor) + '</div>'
+    + '<div class="body">'
+    +   '<div class="artist">' + (esc(F(rec,"Artist")) || "Unknown Artist") + '</div>'
+    +   '<h3 class="album">' + (esc(F(rec,"Album")) || "Untitled") + '</h3>'
+    +   (notes ? '<div class="notes">' + esc(notes) + '</div>' : "")
+    +   '<div class="tags">' + tags.join("") + '</div>'
+    + '</div></article>';
 }
 
 function renderList(which){
@@ -416,30 +425,27 @@ function renderList(which){
   const counter = document.getElementById("count-" + which);
   if(!list.length){
     const noun = which === "owned" ? "records owned" : "records on the want list";
-    const extra = (searchTerm || sourceFilter !== "All") ? " match your filters" : " yet";
-    container.innerHTML = `<div class="state"><div class="big">No ${noun}${extra}.</div></div>`;
+    const extra = (searchTerm || sourceFilter !== "All" || familyFilter !== "All") ? " match your filters" : " yet";
+    container.innerHTML = '<div class="state"><div class="big">No ' + noun + extra + '.</div></div>';
     counter.textContent = "";
     return;
   }
-  container.innerHTML = list.map((r,i) =>
-    card(r).replace('class="card"', `class="card" style="animation-delay:${Math.min(i*40,400)}ms"`)
-  ).join("");
-  counter.textContent = `${list.length} ${list.length===1?'record':'records'}`;
+  container.innerHTML = list.map((r,i) => card(r,i)).join("");
+  counter.textContent = list.length + (list.length===1 ? " record" : " records");
+  if(artObserver) container.querySelectorAll(".art").forEach(el => artObserver.observe(el));
+  else container.querySelectorAll(".art").forEach(loadArt);
 }
 
 /* ---------- states ---------- */
 function showLoading(){
   document.getElementById("records-owned").innerHTML =
-    `<div class="state"><div class="spinner"></div>Spinning up your collection…</div>`;
+    '<div class="state"><div class="spinner">' + vinyl("var(--accent)") + '</div>Spinning up your collection…</div>';
   document.getElementById("records-want").innerHTML = "";
 }
 function showError(msg){
-  const html = `<div class="state error">
-      <div class="big">Couldn't load the vault</div>
-      <div>${esc(msg)}</div>
-      <div style="margin-top:14px;font-size:12px;color:var(--muted)">Reading from <code>${CSV_URL}</code></div>
-      <button class="retry" onclick="fetchSheet()">Try again</button>
-    </div>`;
+  const html = '<div class="state error"><div class="big">Couldn\'t load the vault</div><div>' + esc(msg) + '</div>'
+    + '<div style="margin-top:14px;font-size:12px;color:var(--muted)">Reading from <code>' + CSV_URL + '</code></div>'
+    + '<button class="retry" onclick="fetchSheet()">Try again</button></div>';
   document.getElementById("records-owned").innerHTML = html;
   document.getElementById("records-want").innerHTML = "";
   document.getElementById("count-owned").textContent = "";
@@ -454,7 +460,7 @@ function switchTab(tab){
   document.getElementById("panel-want").classList.toggle("hidden",  tab !== "want");
   document.getElementById("panel-add").classList.toggle("hidden",   tab !== "add");
   document.getElementById("browse-controls").classList.toggle("hidden", tab === "add");
-  window.scrollTo({top:0,behavior:"smooth"});
+  window.scrollTo({ top:0, behavior:"smooth" });
 }
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchTab(t.dataset.tab));
 
@@ -462,6 +468,20 @@ document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchTab(t.dat
 document.getElementById("search").addEventListener("input", e => {
   searchTerm = e.target.value.trim().toLowerCase();
   renderList("owned"); renderList("want");
+});
+
+/* ---------- theme toggle ---------- */
+const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>';
+const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1111.2 3 6.6 6.6 0 0021 12.8z"/></svg>';
+function applyThemeIcon(){
+  const dark = document.documentElement.getAttribute("data-theme") === "dark";
+  document.getElementById("theme-btn").innerHTML = dark ? SUN : MOON;
+}
+document.getElementById("theme-btn").addEventListener("click", () => {
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try{ localStorage.setItem("vv-theme", next); }catch(e){}
+  applyThemeIcon();
 });
 
 /* ---------- add form ---------- */
@@ -475,39 +495,31 @@ document.getElementById("add-form").addEventListener("submit", async e => {
     "Status":      document.getElementById("f-status").value,
     "Genre":       document.getElementById("f-genre").value.trim(),
     "Priority":    document.getElementById("f-priority").value,
+    "Notes":       document.getElementById("f-notes").value.trim(),
     "Source List": document.getElementById("f-source").value,
-    "Notes":       document.getElementById("f-notes").value.trim()
+    "For":         document.getElementById("f-for").value.trim()
   };
-  if(!record.Artist || !record.Album){ return; }
+  if(!record.Artist || !record.Album) return;
 
-  btn.disabled = true; btn.textContent = "Adding…";
-  msg.className = "formmsg";
+  btn.disabled = true; btn.textContent = "Adding…"; msg.className = "formmsg";
   try{
-    // text/plain keeps this a "simple" request and avoids the CORS preflight
-    // that Apps Script web apps don't answer.
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(record)
-    });
-    msg.textContent = "Added! Refreshing your vault…";
-    msg.className = "formmsg ok";
-    e.target.reset();
-    document.getElementById("f-priority").value = "Medium";
-    // give the sheet a moment to write, then reload + jump to the right tab
+    await fetch(SCRIPT_URL, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body:JSON.stringify(record) });
+    msg.textContent = "Added! Refreshing your vault…"; msg.className = "formmsg ok";
+    e.target.reset(); document.getElementById("f-priority").value = "Medium";
     setTimeout(async () => {
       await fetchSheet();
       switchTab(record.Status.toLowerCase().includes("want") ? "want" : "owned");
-    }, 1400);
+    }, 1500);
   }catch(err){
-    msg.textContent = "Couldn't reach the sheet. Check your connection and try again.";
-    msg.className = "formmsg err";
+    msg.textContent = "Couldn't reach the sheet. Check your connection and try again."; msg.className = "formmsg err";
   }finally{
     btn.disabled = false; btn.textContent = "Add to Vault";
   }
 });
 
 /* ---------- go ---------- */
+document.getElementById("brand-disc").innerHTML = vinyl("var(--accent)");
+applyThemeIcon();
 fetchSheet();
 </script>
 </body>
