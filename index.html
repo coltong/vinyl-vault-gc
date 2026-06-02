@@ -143,6 +143,48 @@
   .formmsg.err{display:block;background:color-mix(in srgb,var(--want) 16%,transparent);color:var(--want);}
   .hidden{display:none!important;}
   .count{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;letter-spacing:.4px;}
+
+  /* scan a record */
+  .scan{margin-top:22px;border:1.5px dashed var(--line);border-radius:14px;padding:16px;text-align:center;background:var(--panel-2);}
+  .scan-btn{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#fff;border:none;font-family:inherit;font-weight:700;font-size:14.5px;padding:12px 20px;border-radius:11px;cursor:pointer;transition:.2s;}
+  .scan-btn:active{transform:scale(.97);}
+  .scan-btn svg{width:18px;height:18px;}
+  .scan-status{font-size:12.5px;color:var(--text-dim);margin-top:11px;min-height:16px;}
+  .scan-results{margin-top:10px;}
+  .scan-pick{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin:4px 0 8px;}
+  .cand{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px;margin-bottom:8px;cursor:pointer;transition:.15s;}
+  .cand:active{transform:scale(.99);}
+  .cand:hover{border-color:var(--accent);}
+  .cand-art{width:46px;height:46px;border-radius:8px;overflow:hidden;background:var(--disc);flex:0 0 auto;}
+  .cand-art img{width:100%;height:100%;object-fit:cover;}
+  .cand-body{display:flex;flex-direction:column;min-width:0;}
+  .cand-album{font-family:"Fraunces",serif;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cand-artist{font-size:12px;color:var(--text-dim);}
+  .scan-or{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin:18px 0 0;text-align:center;}
+
+  /* edit button on cards */
+  .card{position:relative;}
+  .card-edit{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text-dim);cursor:pointer;display:grid;place-items:center;transition:.15s;opacity:.65;}
+  .card-edit:hover{opacity:1;color:var(--accent);border-color:var(--accent);}
+  .card-edit:active{transform:scale(.92);}
+  .card-edit svg{width:15px;height:15px;}
+
+  /* edit modal */
+  .modal{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:0;}
+  @media(min-width:560px){ .modal{align-items:center;padding:20px;} }
+  .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);}
+  .modal-card{position:relative;z-index:1;width:100%;max-width:480px;max-height:92vh;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:20px 20px 0 0;padding:20px 18px 26px;box-shadow:0 -10px 40px rgba(0,0,0,.4);animation:sheet .3s cubic-bezier(.2,.7,.2,1);}
+  @media(min-width:560px){ .modal-card{border-radius:18px;} }
+  @keyframes sheet{from{transform:translateY(24px);opacity:0;}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .modal-head h2{font-family:"Fraunces",serif;font-weight:900;font-size:22px;margin:0;}
+  .modal-x{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--text-dim);font-size:22px;line-height:1;cursor:pointer;}
+  .modal-card .field{margin-bottom:13px;}
+  .modal-card .field input,.modal-card .field select,.modal-card .field textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:inherit;font-size:15px;padding:12px 14px;outline:none;}
+  .modal-card .field textarea{resize:vertical;min-height:60px;}
+  .modal-card .field input:focus,.modal-card .field select:focus,.modal-card .field textarea:focus{border-color:var(--accent);}
+  .modal-card .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%239197a0' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
+  .modal-card .submit{width:100%;}
 </style>
 </head>
 <body>
@@ -196,14 +238,21 @@
   </section>
 
   <section id="panel-add" class="hidden">
+    <div class="scan">
+      <input id="scan-input" type="file" accept="image/*" capture="environment" hidden>
+      <button type="button" class="scan-btn" id="scan-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A2.5 2.5 0 015.5 6h1.2l1-1.6A1 1 0 018.5 4h7a1 1 0 01.8.4l1 1.6h1.2A2.5 2.5 0 0121 8.5v8A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5z"/><circle cx="12" cy="12.5" r="3.3"/></svg>
+        Scan a record
+      </button>
+      <div class="scan-status" id="scan-status"></div>
+      <div class="scan-results" id="scan-results"></div>
+    </div>
+    <div class="scan-or">or enter details</div>
     <form id="add-form" autocomplete="off">
       <div class="formmsg" id="form-msg"></div>
       <div class="field"><label for="f-artist">Artist</label><input id="f-artist" type="text" required placeholder="e.g. J Dilla"></div>
       <div class="field"><label for="f-album">Album</label><input id="f-album" type="text" required placeholder="e.g. Donuts"></div>
-      <div class="row2">
-        <div class="field"><label for="f-status">Status</label><select id="f-status"><option value="Owned">Owned</option><option value="Want">Want</option></select></div>
-        <div class="field"><label for="f-priority">Priority</label><select id="f-priority"><option value="High">High</option><option value="Medium" selected>Medium</option><option value="Low">Low</option></select></div>
-      </div>
+      <div class="field"><label for="f-status">Status</label><select id="f-status"><option value="Owned">Owned</option><option value="Want">Want</option></select></div>
       <div class="field"><label for="f-genre">Genre</label><input id="f-genre" type="text" placeholder="e.g. Hip-Hop"></div>
       <div class="field"><label for="f-source">Source List</label>
         <select id="f-source">
@@ -222,6 +271,25 @@
       <button class="submit" id="submit-btn" type="submit">Add to Vault</button>
     </form>
   </section>
+</div>
+
+<div class="modal hidden" id="edit-modal">
+  <div class="modal-backdrop" id="edit-backdrop"></div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>Edit record</h2>
+      <button class="modal-x" id="edit-cancel" aria-label="Close">&times;</button>
+    </div>
+    <div class="formmsg" id="edit-msg"></div>
+    <div class="field"><label for="e-artist">Artist</label><input id="e-artist" type="text"></div>
+    <div class="field"><label for="e-album">Album</label><input id="e-album" type="text"></div>
+    <div class="field"><label for="e-status">Status</label><select id="e-status"><option value="Owned">Owned</option><option value="Want">Want</option></select></div>
+    <div class="field"><label for="e-genre">Genre</label><input id="e-genre" type="text"></div>
+    <div class="field"><label for="e-source">Source List</label><input id="e-source" type="text"></div>
+    <div class="field"><label for="e-for">For (family)</label><input id="e-for" type="text" list="family-list" placeholder="e.g. Susan"></div>
+    <div class="field"><label for="e-notes">Notes</label><textarea id="e-notes"></textarea></div>
+    <button class="submit" id="edit-save">Save changes</button>
+  </div>
 </div>
 
 <script>
@@ -395,11 +463,10 @@ function matches(rec){
 
 function card(rec, i){
   const owned = isOwned(rec);
-  const genre = F(rec,"Genre"), pri = F(rec,"Priority"), src = F(rec,"Source List"), notes = F(rec,"Notes");
+  const genre = F(rec,"Genre"), src = F(rec,"Source List"), notes = F(rec,"Notes");
   const labelColor = owned ? "var(--owned)" : "var(--want)";
   const tags = [];
   if(genre) tags.push('<span class="tag genre">' + esc(genre) + '</span>');
-  if(pri)   tags.push('<span class="tag pri-' + (pri.toLowerCase()||"low") + '">' + esc(pri) + '</span>');
   tags.push('<span class="tag status-' + (owned?'owned':'want') + '">' + (owned?'Owned':'Want') + '</span>');
   if(src)   tags.push('<span class="tag source">' + esc(src) + '</span>');
   famNames(rec).forEach(n => tags.push('<span class="tag fam">' + esc(n) + '</span>'));
@@ -415,7 +482,11 @@ function card(rec, i){
     +   '<h3 class="album">' + (esc(F(rec,"Album")) || "Untitled") + '</h3>'
     +   (notes ? '<div class="notes">' + esc(notes) + '</div>' : "")
     +   '<div class="tags">' + tags.join("") + '</div>'
-    + '</div></article>';
+    + '</div>'
+    + '<button type="button" class="card-edit" title="Edit" aria-label="Edit record">'
+    +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>'
+    + '</button>'
+    + '</article>';
 }
 
 function renderList(which){
@@ -434,6 +505,7 @@ function renderList(which){
   counter.textContent = list.length + (list.length===1 ? " record" : " records");
   if(artObserver) container.querySelectorAll(".art").forEach(el => artObserver.observe(el));
   else container.querySelectorAll(".art").forEach(loadArt);
+  container.querySelectorAll(".card-edit").forEach((btn,i) => btn.onclick = () => openEdit(list[i]));
 }
 
 /* ---------- states ---------- */
@@ -484,6 +556,120 @@ document.getElementById("theme-btn").addEventListener("click", () => {
   applyThemeIcon();
 });
 
+/* ---------- scan a record (camera -> barcode / OCR -> match -> prefill) ---------- */
+let scannedImageUrl = "";
+let tesseractPromise = null;
+function loadTesseract(){
+  if(tesseractPromise) return tesseractPromise;
+  tesseractPromise = new Promise((res,rej)=>{
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+    s.onload = () => res(window.Tesseract);
+    s.onerror = () => rej(new Error("ocr-load-failed"));
+    document.head.appendChild(s);
+  });
+  return tesseractPromise;
+}
+function itunesSearch(term, limit){
+  return new Promise(resolve => {
+    const cb = "its_" + Math.random().toString(36).slice(2);
+    const s = document.createElement("script");
+    let done = false;
+    const finish = d => { if(done) return; done = true; try{ delete window[cb]; }catch(e){} s.remove(); resolve((d && d.results) || []); };
+    window[cb] = d => finish(d);
+    s.onerror = () => finish(null);
+    setTimeout(() => finish(null), 8000);
+    s.src = "https://itunes.apple.com/search?media=music&entity=album&limit=" + (limit||4) + "&callback=" + cb + "&term=" + encodeURIComponent(term);
+    document.body.appendChild(s);
+  });
+}
+async function lookupBarcode(code){
+  try{
+    const r = await fetch("https://musicbrainz.org/ws/2/release?query=barcode:" + encodeURIComponent(code) + "&fmt=json&limit=3");
+    if(!r.ok) return [];
+    const j = await r.json();
+    return (j.releases || []).map(rel => ({
+      artist: (rel["artist-credit"] && rel["artist-credit"][0] && rel["artist-credit"][0].name) || "",
+      album:  rel.title || "",
+      genre:  "",
+      img:    "https://coverartarchive.org/release/" + rel.id + "/front-250"
+    })).filter(c => c.artist && c.album);
+  }catch(e){ return []; }
+}
+function scanStatus(t){ document.getElementById("scan-status").textContent = t || ""; }
+function dedupeCandidates(cands){
+  const seen = new Set(); const out = [];
+  cands.forEach(c => { const k = (c.artist + "|" + c.album).toLowerCase(); if(c.artist && c.album && !seen.has(k)){ seen.add(k); out.push(c); } });
+  return out;
+}
+function renderCandidates(cands){
+  const box = document.getElementById("scan-results");
+  if(!cands.length){ box.innerHTML = ""; return; }
+  box.innerHTML = '<p class="scan-pick">Tap the match:</p>' + cands.slice(0,4).map((c,i) =>
+    '<button type="button" class="cand" data-i="' + i + '">'
+    + '<span class="cand-art">' + (c.img ? '<img src="' + esc(c.img) + '" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">' : "") + '</span>'
+    + '<span class="cand-body"><span class="cand-album">' + esc(c.album) + '</span><span class="cand-artist">' + esc(c.artist) + '</span></span>'
+    + '</button>'
+  ).join("");
+  box.querySelectorAll(".cand").forEach(btn => btn.onclick = () => useCandidate(cands[+btn.dataset.i]));
+}
+function useCandidate(c){
+  document.getElementById("f-artist").value = c.artist || "";
+  document.getElementById("f-album").value  = c.album || "";
+  if(c.genre) document.getElementById("f-genre").value = c.genre;
+  scannedImageUrl = c.img || "";
+  document.getElementById("scan-results").innerHTML = "";
+  scanStatus("Loaded \u2014 check the details below, then tap Add.");
+  document.getElementById("f-artist").scrollIntoView({ behavior:"smooth", block:"center" });
+}
+async function handleScan(file){
+  if(!file) return;
+  scannedImageUrl = "";
+  document.getElementById("scan-results").innerHTML = "";
+  scanStatus("Reading the record\u2026");
+  let cands = [];
+  if("BarcodeDetector" in window){
+    try{
+      const bd = new BarcodeDetector();
+      const bmp = await createImageBitmap(file);
+      const codes = await bd.detect(bmp);
+      for(const code of codes){ cands = cands.concat(await lookupBarcode(code.rawValue)); }
+    }catch(e){}
+  }
+  if(!cands.length){
+    try{
+      scanStatus("Reading the cover text\u2026 (first scan loads the reader)");
+      const T = await loadTesseract();
+      const { data } = await T.recognize(file, "eng");
+      const q = (data.text || "").replace(/[\r\n]+/g," ").replace(/[^\p{L}\p{N}&' .-]/gu," ").replace(/\s+/g," ").trim().slice(0,120);
+      if(q){
+        const res = await itunesSearch(q, 4);
+        cands = cands.concat(res.map(r => ({
+          artist: r.artistName || "",
+          album:  r.collectionName || "",
+          genre:  r.primaryGenreName || "",
+          img:    r.artworkUrl100 ? r.artworkUrl100.replace("100x100","300x300") : ""
+        })));
+      }
+    }catch(e){}
+  }
+  cands = dedupeCandidates(cands);
+  if(cands.length){ scanStatus(""); renderCandidates(cands); }
+  else scanStatus("Couldn't identify it automatically \u2014 just type the details below.");
+}
+document.getElementById("scan-btn").addEventListener("click", () => document.getElementById("scan-input").click());
+document.getElementById("scan-input").addEventListener("change", e => { handleScan(e.target.files[0]); e.target.value = ""; });
+
+/* ---------- write helper (Apps Script: no-cors, so we confirm by refreshing) ---------- */
+function postToScript(payload){
+  return fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+}
+
 /* ---------- add form ---------- */
 document.getElementById("add-form").addEventListener("submit", async e => {
   e.preventDefault();
@@ -494,26 +680,79 @@ document.getElementById("add-form").addEventListener("submit", async e => {
     "Album":       document.getElementById("f-album").value.trim(),
     "Status":      document.getElementById("f-status").value,
     "Genre":       document.getElementById("f-genre").value.trim(),
-    "Priority":    document.getElementById("f-priority").value,
     "Notes":       document.getElementById("f-notes").value.trim(),
     "Source List": document.getElementById("f-source").value,
-    "For":         document.getElementById("f-for").value.trim()
+    "For":         document.getElementById("f-for").value.trim(),
+    "Image URL":   scannedImageUrl || ""
   };
   if(!record.Artist || !record.Album) return;
 
   btn.disabled = true; btn.textContent = "Adding…"; msg.className = "formmsg";
   try{
-    await fetch(SCRIPT_URL, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body:JSON.stringify(record) });
+    await postToScript({ action:"add", record });
     msg.textContent = "Added! Refreshing your vault…"; msg.className = "formmsg ok";
-    e.target.reset(); document.getElementById("f-priority").value = "Medium";
+    e.target.reset();
+    scannedImageUrl = ""; document.getElementById("scan-results").innerHTML = ""; scanStatus("");
     setTimeout(async () => {
       await fetchSheet();
       switchTab(record.Status.toLowerCase().includes("want") ? "want" : "owned");
-    }, 1500);
+    }, 1600);
   }catch(err){
     msg.textContent = "Couldn't reach the sheet. Check your connection and try again."; msg.className = "formmsg err";
   }finally{
     btn.disabled = false; btn.textContent = "Add to Vault";
+  }
+});
+
+/* ---------- edit existing record ---------- */
+let editOriginal = null;   // { Artist, Album } used to locate the row
+let editImageUrl = "";     // preserve existing cover on save
+function openEdit(rec){
+  editOriginal = { Artist: F(rec,"Artist"), Album: F(rec,"Album") };
+  editImageUrl = F(rec,"Image URL");
+  document.getElementById("e-artist").value = F(rec,"Artist");
+  document.getElementById("e-album").value  = F(rec,"Album");
+  document.getElementById("e-status").value = isWant(rec) ? "Want" : "Owned";
+  document.getElementById("e-genre").value  = F(rec,"Genre");
+  document.getElementById("e-source").value = F(rec,"Source List");
+  document.getElementById("e-for").value    = FAMILY_KEY ? F(rec,FAMILY_KEY) : "";
+  document.getElementById("e-notes").value  = F(rec,"Notes");
+  document.getElementById("edit-msg").className = "formmsg";
+  document.getElementById("edit-msg").textContent = "";
+  document.getElementById("edit-modal").classList.remove("hidden");
+}
+function closeEdit(){ document.getElementById("edit-modal").classList.add("hidden"); editOriginal = null; }
+document.getElementById("edit-cancel").onclick = closeEdit;
+document.getElementById("edit-backdrop").onclick = closeEdit;
+
+document.getElementById("edit-save").addEventListener("click", async () => {
+  if(!editOriginal) return;
+  const save = document.getElementById("edit-save");
+  const msg = document.getElementById("edit-msg");
+  const record = {
+    "Artist":      document.getElementById("e-artist").value.trim(),
+    "Album":       document.getElementById("e-album").value.trim(),
+    "Status":      document.getElementById("e-status").value,
+    "Genre":       document.getElementById("e-genre").value.trim(),
+    "Notes":       document.getElementById("e-notes").value.trim(),
+    "Source List": document.getElementById("e-source").value.trim(),
+    "For":         document.getElementById("e-for").value.trim(),
+    "Image URL":   editImageUrl || ""
+  };
+  if(!record.Artist || !record.Album){ msg.textContent = "Artist and Album are required."; msg.className = "formmsg err"; return; }
+
+  save.disabled = true; save.textContent = "Saving…"; msg.className = "formmsg";
+  try{
+    await postToScript({ action:"update", key: editOriginal, record });
+    msg.textContent = "Saved! Refreshing…"; msg.className = "formmsg ok";
+    setTimeout(async () => {
+      await fetchSheet();
+      closeEdit();
+    }, 1600);
+  }catch(err){
+    msg.textContent = "Couldn't reach the sheet. Try again."; msg.className = "formmsg err";
+  }finally{
+    save.disabled = false; save.textContent = "Save changes";
   }
 });
 
