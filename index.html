@@ -588,12 +588,17 @@ async function lookupBarcode(code){
     const r = await fetch("https://musicbrainz.org/ws/2/release?query=barcode:" + encodeURIComponent(code) + "&fmt=json&limit=3");
     if(!r.ok) return [];
     const j = await r.json();
-    return (j.releases || []).map(rel => ({
-      artist: (rel["artist-credit"] && rel["artist-credit"][0] && rel["artist-credit"][0].name) || "",
-      album:  rel.title || "",
-      genre:  "",
-      img:    "https://coverartarchive.org/release/" + rel.id + "/front-250"
-    })).filter(c => c.artist && c.album);
+    return (j.releases || []).map(rel => {
+      const ac = rel["artist-credit"] && rel["artist-credit"][0];
+      // artist.name is the canonical name; .name is the credited variant (often absent)
+      const artist = ac ? ((ac.artist && ac.artist.name) || ac.name || "") : "";
+      return {
+        artist,
+        album:  rel.title || "",
+        genre:  "",
+        img:    "https://coverartarchive.org/release/" + rel.id + "/front-250"
+      };
+    }).filter(c => c.artist && c.album);
   }catch(e){ return []; }
 }
 function scanStatus(t){ document.getElementById("scan-status").textContent = t || ""; }
@@ -615,11 +620,15 @@ function renderCandidates(cands){
 }
 function useCandidate(c){
   document.getElementById("f-artist").value = c.artist || "";
-  document.getElementById("f-album").value  = c.album || "";
+  document.getElementById("f-album").value  = c.album  || "";
   if(c.genre) document.getElementById("f-genre").value = c.genre;
   scannedImageUrl = c.img || "";
   document.getElementById("scan-results").innerHTML = "";
-  scanStatus("Loaded \u2014 check the details below, then tap Add.");
+  if(!c.artist){
+    scanStatus("Album found but artist name is missing \u2014 please fill it in above.");
+  } else {
+    scanStatus("Loaded \u2014 check the details below, then tap Add.");
+  }
   document.getElementById("f-artist").scrollIntoView({ behavior:"smooth", block:"center" });
 }
 async function handleScan(file){
@@ -685,11 +694,14 @@ document.getElementById("add-form").addEventListener("submit", async e => {
     "For":         document.getElementById("f-for").value.trim(),
     "Image URL":   scannedImageUrl || ""
   };
-  if(!record.Artist || !record.Album) return;
+  if(!record.Artist || !record.Album){
+    msg.textContent = "Artist and Album are required."; msg.className = "formmsg err"; return;
+  }
 
   btn.disabled = true; btn.textContent = "Adding…"; msg.className = "formmsg";
   try{
-    await postToScript({ action:"add", record });
+    // flat payload: backward-compatible with original Apps Script AND the new Code.gs
+    await postToScript({ action:"add", ...record });
     msg.textContent = "Added! Refreshing your vault…"; msg.className = "formmsg ok";
     e.target.reset();
     scannedImageUrl = ""; document.getElementById("scan-results").innerHTML = ""; scanStatus("");
