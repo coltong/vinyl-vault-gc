@@ -10,6 +10,25 @@
 var PASSCODE = "vinylvault2024"; // <-- CHANGE THIS to a personal passcode
 
 // ============================================================
+// testAuthorization — RUN THIS ONCE FROM THE APPS SCRIPT EDITOR
+// to grant the script permission to access your Google Sheet.
+// Click the ▶ Run button with this function selected.
+// ============================================================
+function testAuthorization() {
+  try {
+    var sheetId = "1IpetK_EynQ5HLbjcEoQi_ewlkRnEi9UX__JIvw_ugZM";
+    var ss = SpreadsheetApp.openById(sheetId);
+    var sheet = ss.getSheetByName("Collection_Master");
+    var lastRow = sheet.getLastRow();
+    Logger.log("✅ Authorization OK. Sheet found: " + sheet.getName() + " | Rows: " + lastRow);
+    Logger.log("✅ Passcode is set to: " + PASSCODE);
+  } catch(err) {
+    Logger.log("❌ Authorization FAILED: " + err.toString());
+    Logger.log("   → If you see a permissions error, click 'Review Permissions' and allow access.");
+  }
+}
+
+// ============================================================
 // doGet — Authenticated sheet read (replaces public CSV export)
 // ============================================================
 function doGet(e) {

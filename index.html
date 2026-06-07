@@ -439,20 +439,35 @@ async function attemptUnlock(){
   try {
     const url = SCRIPT_URL + "?token=" + encodeURIComponent(token);
     const res = await fetch(url);
-    const json = await res.json();
+    let json;
+    // Try to parse JSON; if it fails the script may have returned HTML (auth redirect)
+    try {
+      json = await res.json();
+    } catch(parseErr) {
+      console.error("VV: response was not JSON — Apps Script may need authorization.", parseErr);
+      errEl.textContent = "Server returned an unexpected response. Check the Apps Script is deployed and authorized. (See console for details.)";
+      btn.disabled = false; btn.textContent = "Unlock Vault";
+      return;
+    }
+    console.log("VV unlock response:", json);
     if(json.success){
       saveToken(token);
       hideLockScreen();
       RECORDS = json.records || [];
       FAMILY_KEY = RECORDS.length ? (Object.keys(RECORDS[0]).find(k => /^(for|family|recipient|gift for)$/i.test(k)) || null) : null;
       renderAll();
-    } else {
-      errEl.textContent = "Incorrect passcode. Try again.";
+    } else if(json.error === "Unauthorized") {
+      errEl.textContent = "Incorrect passcode — please try again.";
       input.value = "";
       input.focus();
+    } else {
+      // Real server error (e.g. script not authorized to access sheet)
+      errEl.textContent = "Server error: " + (json.error || "unknown") + ". The Apps Script may need to be re-authorized — see the walkthrough.";
+      console.error("VV server error:", json.error);
     }
   } catch(err) {
-    errEl.textContent = "Couldn't connect. Check your connection.";
+    console.error("VV fetch error:", err);
+    errEl.textContent = "Couldn't connect. Check your internet connection.";
   } finally {
     btn.disabled = false; btn.textContent = "Unlock Vault";
   }
