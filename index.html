@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#111317">
 <title>Vinyl Vault</title>
+<meta name="description" content="Your personal vinyl record collection tracker. Crate-digging, catalogued.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Hanken+Grotesque:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -57,12 +58,13 @@
   h1{font-family:"Fraunces",serif;font-weight:900;font-size:33px;line-height:.95;margin:0;letter-spacing:-.5px;}
   h1 em{font-style:italic;font-weight:500;color:var(--accent);}
   .tagline{font-size:12px;color:var(--muted);letter-spacing:.6px;margin-top:3px;text-transform:uppercase;}
-  .theme-btn{
+  .header-actions{display:flex;align-items:center;gap:8px;}
+  .icon-btn{
     flex:0 0 auto;width:40px;height:40px;border-radius:11px;border:1px solid var(--line);
     background:var(--panel);color:var(--text);cursor:pointer;display:grid;place-items:center;transition:.2s;
   }
-  .theme-btn:active{transform:scale(.94);}
-  .theme-btn svg{width:19px;height:19px;}
+  .icon-btn:active{transform:scale(.94);}
+  .icon-btn svg{width:19px;height:19px;}
 
   /* stats */
   .stats{display:flex;gap:10px;margin-top:20px;}
@@ -113,9 +115,6 @@
   .tag.fam{background:color-mix(in srgb,var(--family) 16%,transparent);color:var(--family);border-color:color-mix(in srgb,var(--family) 38%,transparent);}
   .tag.status-owned{background:color-mix(in srgb,var(--owned) 14%,transparent);color:var(--owned);border-color:color-mix(in srgb,var(--owned) 32%,transparent);}
   .tag.status-want{background:color-mix(in srgb,var(--want) 14%,transparent);color:var(--want);border-color:color-mix(in srgb,var(--want) 32%,transparent);}
-  .tag.pri-high{background:color-mix(in srgb,var(--rose) 14%,transparent);color:var(--rose);border-color:color-mix(in srgb,var(--rose) 32%,transparent);}
-  .tag.pri-medium{background:color-mix(in srgb,var(--slate) 16%,transparent);color:var(--slate);border-color:color-mix(in srgb,var(--slate) 34%,transparent);}
-  .tag.pri-low{background:color-mix(in srgb,var(--text) 7%,transparent);color:var(--text-dim);border-color:var(--line);}
 
   /* states */
   .state{text-align:center;padding:60px 20px;color:var(--text-dim);}
@@ -144,7 +143,9 @@
   .hidden{display:none!important;}
   .count{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;letter-spacing:.4px;}
 
-  /* scan a record */
+  /* ============================================================
+     SCAN SECTION — live camera viewfinder
+     ============================================================ */
   .scan{margin-top:22px;border:1.5px dashed var(--line);border-radius:14px;padding:16px;text-align:center;background:var(--panel-2);}
   .scan-btn{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#fff;border:none;font-family:inherit;font-weight:700;font-size:14.5px;padding:12px 20px;border-radius:11px;cursor:pointer;transition:.2s;}
   .scan-btn:active{transform:scale(.97);}
@@ -161,6 +162,42 @@
   .cand-album{font-family:"Fraunces",serif;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cand-artist{font-size:12px;color:var(--text-dim);}
   .scan-or{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin:18px 0 0;text-align:center;}
+
+  /* live camera overlay */
+  .camera-overlay{
+    position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.95);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:16px;padding:20px;
+  }
+  .camera-overlay.hidden{display:none!important;}
+  .camera-wrap{
+    position:relative;width:100%;max-width:420px;border-radius:20px;overflow:hidden;
+    background:#000;aspect-ratio:4/3;
+    box-shadow:0 0 0 3px var(--accent), 0 24px 60px rgba(0,0,0,.8);
+  }
+  .camera-video{width:100%;height:100%;object-fit:cover;display:block;}
+  .camera-laser{
+    position:absolute;left:10%;right:10%;height:2px;top:50%;transform:translateY(-50%);
+    background:linear-gradient(90deg, transparent, var(--accent), transparent);
+    box-shadow:0 0 10px var(--accent);
+    animation:laser 2s ease-in-out infinite;
+  }
+  @keyframes laser{0%,100%{top:25%;}50%{top:75%;}}
+  .camera-corners::before,.camera-corners::after{
+    content:"";position:absolute;width:28px;height:28px;border-color:var(--accent);border-style:solid;border-width:0;
+  }
+  .camera-corners::before{top:12px;left:12px;border-top-width:3px;border-left-width:3px;border-radius:4px 0 0 0;}
+  .camera-corners::after{bottom:12px;right:12px;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 4px 4px;}
+  .camera-corner-tr,.camera-corner-bl{position:absolute;width:28px;height:28px;border-color:var(--accent);border-style:solid;}
+  .camera-corner-tr{top:12px;right:12px;border-top-width:3px;border-right-width:3px;border-radius:0 4px 0 0;}
+  .camera-corner-bl{bottom:12px;left:12px;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 4px;}
+  .camera-hint{color:rgba(255,255,255,.7);font-size:13px;text-align:center;line-height:1.5;max-width:320px;}
+  .camera-actions{display:flex;gap:12px;width:100%;max-width:420px;}
+  .cam-btn{flex:1;padding:14px;border:none;border-radius:13px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:.2s;}
+  .cam-btn.primary{background:var(--accent);color:#fff;}
+  .cam-btn.secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);}
+  .cam-btn:active{transform:scale(.97);}
+  .cam-status{color:var(--accent);font-size:12.5px;text-align:center;min-height:18px;max-width:320px;font-weight:600;}
 
   /* edit button on cards */
   .card{position:relative;}
@@ -185,9 +222,81 @@
   .modal-card .field input:focus,.modal-card .field select:focus,.modal-card .field textarea:focus{border-color:var(--accent);}
   .modal-card .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%239197a0' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
   .modal-card .submit{width:100%;}
+
+  /* ============================================================
+     PASSCODE GATE
+     ============================================================ */
+  .lock-screen{
+    position:fixed;inset:0;z-index:200;
+    background:var(--bg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px 24px;
+    gap:24px;
+  }
+  .lock-screen::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(120% 80% at 88% -12%, color-mix(in srgb,var(--accent) 16%,transparent), transparent 55%),
+      radial-gradient(90% 70% at -12% 112%, color-mix(in srgb,var(--total) 14%,transparent), transparent 55%);
+  }
+  .lock-screen.hidden{display:none!important;}
+  .lock-disc{width:80px;height:80px;animation:spin 8s linear infinite;filter:drop-shadow(0 8px 20px rgba(21,168,154,.35));position:relative;z-index:1;}
+  .lock-title{font-family:"Fraunces",serif;font-weight:900;font-size:38px;text-align:center;line-height:.95;margin:0;position:relative;z-index:1;}
+  .lock-title em{font-style:italic;font-weight:500;color:var(--accent);}
+  .lock-sub{font-size:13px;color:var(--muted);text-align:center;letter-spacing:.4px;position:relative;z-index:1;}
+  .lock-form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;}
+  .lock-input{
+    width:100%;background:var(--panel);border:1.5px solid var(--line);
+    border-radius:14px;color:var(--text);font-family:inherit;font-size:18px;
+    padding:16px 18px;outline:none;text-align:center;letter-spacing:4px;
+    transition:.2s;
+  }
+  .lock-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent);}
+  .lock-btn{
+    background:var(--accent);color:#fff;border:none;
+    font-family:inherit;font-weight:700;font-size:16px;
+    padding:16px;border-radius:13px;cursor:pointer;transition:.2s;
+    box-shadow:0 10px 28px -10px color-mix(in srgb,var(--accent) 70%,transparent);
+  }
+  .lock-btn:active{transform:scale(.98);}
+  .lock-err{font-size:13px;color:var(--want);text-align:center;min-height:20px;font-weight:600;}
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     PASSCODE GATE
+     ============================================================ -->
+<div class="lock-screen" id="lock-screen">
+  <span class="lock-disc" id="lock-disc"></span>
+  <h1 class="lock-title">Vinyl <em>Vault</em></h1>
+  <p class="lock-sub">Enter your passcode to unlock your collection</p>
+  <div class="lock-form">
+    <input class="lock-input" id="lock-input" type="password" placeholder="••••••" autocomplete="current-password" autocorrect="off" spellcheck="false">
+    <div class="lock-err" id="lock-err"></div>
+    <button class="lock-btn" id="lock-btn" type="button">Unlock Vault</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     LIVE CAMERA SCANNER OVERLAY
+     ============================================================ -->
+<div class="camera-overlay hidden" id="camera-overlay">
+  <div class="camera-wrap" id="camera-wrap">
+    <video class="camera-video" id="camera-video" autoplay muted playsinline></video>
+    <div class="camera-laser"></div>
+    <div class="camera-corners"></div>
+    <div class="camera-corner-tr"></div>
+    <div class="camera-corner-bl"></div>
+  </div>
+  <div class="cam-status" id="cam-status">Point camera at a barcode or album cover…</div>
+  <div class="camera-hint">Barcode detected automatically. Tap "Read Cover Text" to run OCR on the current frame.</div>
+  <div class="camera-actions">
+    <button class="cam-btn secondary" id="cam-ocr-btn" type="button">📖 Read Cover Text</button>
+    <button class="cam-btn secondary" id="cam-close-btn" type="button">✕ Cancel</button>
+  </div>
+</div>
+
 <div class="wrap">
   <header>
     <div class="brand">
@@ -197,7 +306,12 @@
         <div class="tagline">Crate-digging, catalogued</div>
       </div>
     </div>
-    <button class="theme-btn" id="theme-btn" title="Toggle light / dark" aria-label="Toggle theme"></button>
+    <div class="header-actions">
+      <button class="icon-btn" id="lock-btn-header" title="Lock Vault" aria-label="Lock Vault">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      </button>
+      <button class="icon-btn" id="theme-btn" title="Toggle light / dark" aria-label="Toggle theme"></button>
+    </div>
   </header>
 
   <div class="stats">
@@ -239,7 +353,6 @@
 
   <section id="panel-add" class="hidden">
     <div class="scan">
-      <input id="scan-input" type="file" accept="image/*" capture="environment" hidden>
       <button type="button" class="scan-btn" id="scan-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A2.5 2.5 0 015.5 6h1.2l1-1.6A1 1 0 018.5 4h7a1 1 0 01.8.4l1 1.6h1.2A2.5 2.5 0 0121 8.5v8A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5z"/><circle cx="12" cy="12.5" r="3.3"/></svg>
         Scan a record
@@ -289,11 +402,72 @@
 </div>
 
 <script>
-const CSV_URL    = "https://docs.google.com/spreadsheets/d/1IpetK_EynQ5HLbjcEoQi_ewlkRnEi9UX__JIvw_ugZM/export?format=csv&gid=1619124955";
+// ============================================================
+// CONFIG — Apps Script URL (handles both reads and writes)
+// ============================================================
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz99r2Zfu-zVCEsyfVZNjeRF70kD5fXirOPv8m4UjrvuYPbMwZb3ezztfS-3aIb2KRE/exec";
+const TOKEN_KEY  = "vv-token";
 
+// ============================================================
+// PASSCODE GATE
+// ============================================================
+function getSavedToken(){ try{ return localStorage.getItem(TOKEN_KEY)||""; }catch(e){ return ""; } }
+function saveToken(t){ try{ localStorage.setItem(TOKEN_KEY, t); }catch(e){} }
+function clearToken(){ try{ localStorage.removeItem(TOKEN_KEY); }catch(e){} }
+
+function showLockScreen(){
+  document.getElementById("lock-screen").classList.remove("hidden");
+  document.getElementById("lock-input").value = "";
+  document.getElementById("lock-err").textContent = "";
+  setTimeout(()=>document.getElementById("lock-input").focus(), 200);
+}
+function hideLockScreen(){
+  document.getElementById("lock-screen").classList.add("hidden");
+}
+
+document.getElementById("lock-btn").addEventListener("click", attemptUnlock);
+document.getElementById("lock-input").addEventListener("keydown", e => { if(e.key==="Enter") attemptUnlock(); });
+
+async function attemptUnlock(){
+  const input = document.getElementById("lock-input");
+  const errEl = document.getElementById("lock-err");
+  const btn   = document.getElementById("lock-btn");
+  const token = input.value.trim();
+  if(!token){ errEl.textContent = "Please enter your passcode."; return; }
+  btn.disabled = true; btn.textContent = "Checking…"; errEl.textContent = "";
+  // Test the token by making a real GET request to the Apps Script
+  try {
+    const url = SCRIPT_URL + "?token=" + encodeURIComponent(token);
+    const res = await fetch(url);
+    const json = await res.json();
+    if(json.success){
+      saveToken(token);
+      hideLockScreen();
+      RECORDS = json.records || [];
+      FAMILY_KEY = RECORDS.length ? (Object.keys(RECORDS[0]).find(k => /^(for|family|recipient|gift for)$/i.test(k)) || null) : null;
+      renderAll();
+    } else {
+      errEl.textContent = "Incorrect passcode. Try again.";
+      input.value = "";
+      input.focus();
+    }
+  } catch(err) {
+    errEl.textContent = "Couldn't connect. Check your connection.";
+  } finally {
+    btn.disabled = false; btn.textContent = "Unlock Vault";
+  }
+}
+
+document.getElementById("lock-btn-header").addEventListener("click", () => {
+  clearToken();
+  showLockScreen();
+});
+
+// ============================================================
+// STATE
+// ============================================================
 let RECORDS = [];
-let FAMILY_KEY = null;            // detected "For" column name, if present
+let FAMILY_KEY = null;
 let currentTab = "owned";
 let searchTerm = "";
 let sourceFilter = "All";
@@ -317,54 +491,6 @@ function vinyl(label){
     + '</svg>';
 }
 
-/* ---------- CSV parser (quotes, commas, all line endings, preamble rows) ---------- */
-function parseCSV(text){
-  const norm = text.trim().replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-  const rows = [];
-  let row = [], field = "", inQuotes = false;
-  for(let i=0;i<norm.length;i++){
-    const c = norm[i];
-    if(inQuotes){
-      if(c === '"'){ if(norm[i+1] === '"'){ field += '"'; i++; } else inQuotes = false; }
-      else field += c;
-    } else {
-      if(c === '"') inQuotes = true;
-      else if(c === ',') { row.push(field); field=""; }
-      else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=""; }
-      else field += c;
-    }
-  }
-  row.push(field); rows.push(row);
-  if(!rows.length) return [];
-
-  const headerIdx = rows.findIndex(r => {
-    const low = r.map(c => c.trim().toLowerCase());
-    return low.includes("artist") && low.includes("album") && low.includes("status");
-  });
-  if(headerIdx === -1) throw new Error("Couldn't find the Artist/Album/Status header row — the tab (gid) may be pointing at the wrong sheet.");
-
-  const headers = rows[headerIdx].map(h => h.trim());
-  return rows.slice(headerIdx + 1)
-    .filter(r => r.some(c => c.trim() !== ""))
-    .map(r => { const o={}; headers.forEach((h,i)=>{ if(h) o[h]=(r[i] ?? "").trim(); }); return o; });
-}
-
-/* ---------- fetch ---------- */
-async function fetchSheet(){
-  showLoading();
-  try{
-    const res = await fetch(CSV_URL, { cache:"no-store" });
-    if(!res.ok) throw new Error("HTTP " + res.status);
-    const text = await res.text();
-    if(/<html|<!doctype/i.test(text.slice(0,200))) throw new Error("Got an HTML page instead of CSV — check sheet sharing.");
-    RECORDS = parseCSV(text);
-    FAMILY_KEY = RECORDS.length ? (Object.keys(RECORDS[0]).find(k => /^(for|family|recipient|gift for)$/i.test(k)) || null) : null;
-    renderAll();
-  }catch(err){
-    showError(err.message || "Could not load data.");
-  }
-}
-
 /* ---------- helpers ---------- */
 const F = (rec,key) => (rec[key] || "").toString();
 const statusOf = rec => F(rec,"Status").toLowerCase();
@@ -373,7 +499,41 @@ const isWant  = rec => statusOf(rec).includes("want");
 const famNames = rec => FAMILY_KEY ? F(rec,FAMILY_KEY).split(",").map(s=>s.trim()).filter(Boolean) : [];
 function esc(s){ return (s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-/* ---------- album art via iTunes (JSONP, cached, graceful fallback) ---------- */
+/* ---------- fetch (now authenticated via Apps Script doGet) ---------- */
+async function fetchSheet(){
+  const token = getSavedToken();
+  if(!token){ showLockScreen(); return; }
+  showLoading();
+  try{
+    const url = SCRIPT_URL + "?token=" + encodeURIComponent(token);
+    const res = await fetch(url);
+    const json = await res.json();
+    if(!json.success){
+      if(json.error === "Unauthorized"){
+        clearToken(); showLockScreen(); return;
+      }
+      throw new Error(json.error || "Unknown error from server.");
+    }
+    RECORDS = json.records || [];
+    FAMILY_KEY = RECORDS.length ? (Object.keys(RECORDS[0]).find(k => /^(for|family|recipient|gift for)$/i.test(k)) || null) : null;
+    renderAll();
+  }catch(err){
+    showError(err.message || "Could not load data.");
+  }
+}
+
+/* ---------- write helper (now sends passcode) ---------- */
+function postToScript(payload){
+  const token = getSavedToken();
+  return fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ ...payload, token })
+  });
+}
+
+/* ---------- album art via iTunes (JSONP) ---------- */
 const artCache = {};
 function itunesLookup(term){
   return new Promise(resolve => {
@@ -514,7 +674,7 @@ function renderList(which){
   container.querySelectorAll(".card-edit").forEach((btn,i) => btn.onclick = () => openEdit(list[i]));
 }
 
-/* ---------- states ---------- */
+/* ---------- loading/error states ---------- */
 function showLoading(){
   document.getElementById("records-owned").innerHTML =
     '<div class="state"><div class="spinner">' + vinyl("var(--accent)") + '</div>Spinning up your collection…</div>';
@@ -522,7 +682,6 @@ function showLoading(){
 }
 function showError(msg){
   const html = '<div class="state error"><div class="big">Couldn\'t load the vault</div><div>' + esc(msg) + '</div>'
-    + '<div style="margin-top:14px;font-size:12px;color:var(--muted)">Reading from <code>' + CSV_URL + '</code></div>'
     + '<button class="retry" onclick="fetchSheet()">Try again</button></div>';
   document.getElementById("records-owned").innerHTML = html;
   document.getElementById("records-want").innerHTML = "";
@@ -562,9 +721,113 @@ document.getElementById("theme-btn").addEventListener("click", () => {
   applyThemeIcon();
 });
 
-/* ---------- scan a record (camera -> barcode / OCR -> match -> prefill) ---------- */
+/* ============================================================
+   LIVE CAMERA BARCODE/OCR SCANNER
+   ============================================================ */
+let cameraStream = null;
+let barcodeDetector = null;
+let scanLoopActive = false;
 let scannedImageUrl = "";
 let tesseractPromise = null;
+
+// Initialise BarcodeDetector with all supported formats
+async function initBarcodeDetector(){
+  if(!("BarcodeDetector" in window)) return null;
+  try {
+    const supported = await BarcodeDetector.getSupportedFormats().catch(()=>[]);
+    const formats = supported.length ? supported : ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','qr_code'];
+    return new BarcodeDetector({ formats });
+  } catch(e){ return null; }
+}
+
+// Start camera and open viewfinder overlay
+async function openCamera(){
+  const overlay = document.getElementById("camera-overlay");
+  const video   = document.getElementById("camera-video");
+  const status  = document.getElementById("cam-status");
+
+  overlay.classList.remove("hidden");
+  status.textContent = "Starting camera…";
+
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 960 } },
+      audio: false
+    });
+    video.srcObject = cameraStream;
+    await video.play();
+    status.textContent = "Point at a barcode or album cover…";
+    barcodeDetector = await initBarcodeDetector();
+    if(barcodeDetector){
+      startScanLoop();
+    } else {
+      status.textContent = "Barcode scanning not supported — tap 'Read Cover Text' to use OCR.";
+    }
+  } catch(err) {
+    // Camera access denied or unavailable — fall back to file picker
+    overlay.classList.add("hidden");
+    stopCamera();
+    scanStatus("Camera unavailable — using file picker instead.");
+    openFilePicker();
+  }
+}
+
+function stopCamera(){
+  scanLoopActive = false;
+  if(cameraStream){ cameraStream.getTracks().forEach(t=>t.stop()); cameraStream=null; }
+  const video = document.getElementById("camera-video");
+  video.srcObject = null;
+  document.getElementById("camera-overlay").classList.add("hidden");
+}
+
+// Continuous scan loop — reads frames from the live video and checks for barcodes
+function startScanLoop(){
+  scanLoopActive = true;
+  const video = document.getElementById("camera-video");
+  const status = document.getElementById("cam-status");
+  let lastDetect = 0;
+
+  async function loop(){
+    if(!scanLoopActive) return;
+    const now = Date.now();
+    if(now - lastDetect > 300 && video.readyState >= 2){
+      lastDetect = now;
+      try {
+        const codes = await barcodeDetector.detect(video);
+        if(codes && codes.length > 0){
+          const codeVal = codes[0].rawValue;
+          status.textContent = "Barcode found: " + codeVal + " — looking up…";
+          stopCamera();
+          scanStatus("Barcode detected: " + codeVal + ". Querying database…");
+          const cands = await lookupBarcode(codeVal);
+          processCandidates(cands, codeVal);
+          return;
+        }
+      } catch(e){}
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+// Capture a still frame from video for OCR
+async function captureAndOCR(){
+  const video = document.getElementById("camera-video");
+  const status = document.getElementById("cam-status");
+  if(!video.srcObject){ return; }
+  status.textContent = "Capturing frame for OCR…";
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+  canvas.toBlob(async (blob) => {
+    stopCamera();
+    scanStatus("Analysing cover text…");
+    await runOCR(blob);
+  }, "image/jpeg", 0.85);
+}
+
+// Tesseract OCR on a blob/file
 function loadTesseract(){
   if(tesseractPromise) return tesseractPromise;
   tesseractPromise = new Promise((res,rej)=>{
@@ -576,6 +839,94 @@ function loadTesseract(){
   });
   return tesseractPromise;
 }
+
+async function runOCR(blob){
+  let timeout = null;
+  try {
+    scanStatus("Reading cover text… (first scan loads reader)");
+    timeout = setTimeout(() => scanStatus("Still loading reader — this can take a moment…"), 4000);
+    const T = await loadTesseract();
+    clearTimeout(timeout);
+    scanStatus("Analysing image text…");
+    const { data } = await T.recognize(blob, "eng");
+    const q = (data.text || "").replace(/[\r\n]+/g," ").replace(/[^\p{L}\p{N}&' .-]/gu," ").replace(/\s+/g," ").trim().slice(0,120);
+    if(q){
+      scanStatus('Searching: "' + (q.length > 30 ? q.slice(0,30)+"…" : q) + '"…');
+      const results = await itunesSearch(q, 4);
+      const cands = results.map(r => ({
+        artist: r.artistName || "",
+        album:  r.collectionName || "",
+        genre:  r.primaryGenreName || "",
+        img:    r.artworkUrl100 ? r.artworkUrl100.replace("100x100","300x300") : ""
+      }));
+      processCandidates(dedupeCandidates(cands), q);
+    } else {
+      scanStatus("Couldn't read any text. Try a clearer photo or type manually.");
+    }
+  } catch(e) {
+    if(timeout) clearTimeout(timeout);
+    scanStatus("OCR failed. Please enter details manually.");
+  }
+}
+
+// File picker fallback (used when camera unavailable or denied)
+function openFilePicker(){
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = "image/*";
+  inp.capture = "environment";
+  inp.style.display = "none";
+  document.body.appendChild(inp);
+  inp.addEventListener("change", async e => {
+    const file = e.target.files[0];
+    inp.remove();
+    if(!file) return;
+    scannedImageUrl = "";
+    document.getElementById("scan-results").innerHTML = "";
+    scanStatus("Reading image…");
+    // Try barcode on the file first
+    if(barcodeDetector || "BarcodeDetector" in window){
+      if(!barcodeDetector) barcodeDetector = await initBarcodeDetector();
+      if(barcodeDetector){
+        try{
+          const bmp = await createImageBitmap(file);
+          const codes = await barcodeDetector.detect(bmp);
+          if(codes && codes.length > 0){
+            const codeVal = codes[0].rawValue;
+            scanStatus("Barcode detected: " + codeVal + ". Querying database…");
+            const cands = await lookupBarcode(codeVal);
+            processCandidates(cands, codeVal);
+            return;
+          }
+        }catch(e){}
+      }
+    }
+    await runOCR(file);
+  });
+  inp.click();
+}
+
+// Scan button — try live camera first
+document.getElementById("scan-btn").addEventListener("click", async () => {
+  scannedImageUrl = "";
+  document.getElementById("scan-results").innerHTML = "";
+  scanStatus("");
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    await openCamera();
+  } else {
+    scanStatus("Camera API not available — using file picker.");
+    openFilePicker();
+  }
+});
+
+// Camera overlay controls
+document.getElementById("cam-ocr-btn").addEventListener("click", captureAndOCR);
+document.getElementById("cam-close-btn").addEventListener("click", () => {
+  stopCamera();
+  scanStatus("Scan cancelled.");
+});
+
+// iTunes search (JSONP)
 function itunesSearch(term, limit){
   return new Promise(resolve => {
     const cb = "its_" + Math.random().toString(36).slice(2);
@@ -583,12 +934,14 @@ function itunesSearch(term, limit){
     let done = false;
     const finish = d => { if(done) return; done = true; try{ delete window[cb]; }catch(e){} s.remove(); resolve((d && d.results) || []); };
     window[cb] = d => finish(d);
-    s.onerror = () => finish(null);
-    setTimeout(() => finish(null), 8000);
+    s.onerror = () => finish([]);
+    setTimeout(() => finish([]), 8000);
     s.src = "https://itunes.apple.com/search?media=music&entity=album&limit=" + (limit||4) + "&callback=" + cb + "&term=" + encodeURIComponent(term);
     document.body.appendChild(s);
   });
 }
+
+// MusicBrainz barcode lookup
 async function lookupBarcode(code){
   try{
     const r = await fetch("https://musicbrainz.org/ws/2/release?query=barcode:" + encodeURIComponent(code) + "&fmt=json&limit=3");
@@ -596,7 +949,6 @@ async function lookupBarcode(code){
     const j = await r.json();
     return (j.releases || []).map(rel => {
       const ac = rel["artist-credit"] && rel["artist-credit"][0];
-      // artist.name is the canonical name; .name is the credited variant (often absent)
       const artist = ac ? ((ac.artist && ac.artist.name) || ac.name || "") : "";
       return {
         artist,
@@ -607,12 +959,15 @@ async function lookupBarcode(code){
     }).filter(c => c.artist && c.album);
   }catch(e){ return []; }
 }
+
 function scanStatus(t){ document.getElementById("scan-status").textContent = t || ""; }
+
 function dedupeCandidates(cands){
   const seen = new Set(); const out = [];
   cands.forEach(c => { const k = (c.artist + "|" + c.album).toLowerCase(); if(c.artist && c.album && !seen.has(k)){ seen.add(k); out.push(c); } });
   return out;
 }
+
 function renderCandidates(cands){
   const box = document.getElementById("scan-results");
   if(!cands.length){ box.innerHTML = ""; return; }
@@ -624,6 +979,17 @@ function renderCandidates(cands){
   ).join("");
   box.querySelectorAll(".cand").forEach(btn => btn.onclick = () => useCandidate(cands[+btn.dataset.i]));
 }
+
+function processCandidates(cands, query){
+  cands = dedupeCandidates(cands);
+  if(cands.length){
+    scanStatus("Select the correct match:");
+    renderCandidates(cands);
+  } else {
+    scanStatus("No match found for "" + query + "". Try again or enter manually.");
+  }
+}
+
 function useCandidate(c){
   document.getElementById("f-artist").value = c.artist || "";
   document.getElementById("f-album").value  = c.album  || "";
@@ -631,82 +997,11 @@ function useCandidate(c){
   scannedImageUrl = c.img || "";
   document.getElementById("scan-results").innerHTML = "";
   if(!c.artist){
-    scanStatus("Album found but artist name is missing \u2014 please fill it in above.");
+    scanStatus("Album found but artist name is missing — please fill it in.");
   } else {
-    scanStatus("Loaded \u2014 check the details below, then tap Add.");
+    scanStatus("Loaded — check the details, then tap Add.");
   }
   document.getElementById("f-artist").scrollIntoView({ behavior:"smooth", block:"center" });
-}
-async function handleScan(file){
-  if(!file) return;
-  scannedImageUrl = "";
-  document.getElementById("scan-results").innerHTML = "";
-  scanStatus("Reading the record\u2026");
-  let cands = [];
-  if("BarcodeDetector" in window){
-    try{
-      let formats = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'code_93', 'codabar', 'data_matrix', 'itf', 'pdf417', 'qr_code', 'aztec'];
-      try {
-        const supported = await BarcodeDetector.getSupportedFormats();
-        if (supported && supported.length) formats = supported;
-      } catch (err) {}
-      const bd = new BarcodeDetector({ formats });
-      const bmp = await createImageBitmap(file);
-      const codes = await bd.detect(bmp);
-      if (codes && codes.length > 0) {
-        const codeVal = codes[0].rawValue;
-        scanStatus("Found barcode: " + codeVal + ". Querying database\u2026");
-        cands = cands.concat(await lookupBarcode(codeVal));
-      }
-    }catch(e){}
-  }
-  if(!cands.length){
-    let tesseractTimeout = null;
-    try{
-      scanStatus("Reading the cover text\u2026 (first scan loads reader)");
-      tesseractTimeout = setTimeout(() => {
-        scanStatus("Still loading reader (this can take a moment on slow connections)\u2026");
-      }, 4000);
-      
-      const T = await loadTesseract();
-      clearTimeout(tesseractTimeout);
-      
-      scanStatus("Analyzing cover image text\u2026");
-      const { data } = await T.recognize(file, "eng");
-      const q = (data.text || "").replace(/[\r\n]+/g," ").replace(/[^\p{L}\p{N}&' .-]/gu," ").replace(/\s+/g," ").trim().slice(0,120);
-      if(q){
-        scanStatus("Searching matching albums for: \"" + (q.length > 30 ? q.slice(0, 30) + "..." : q) + "\"\u2026");
-        const res = await itunesSearch(q, 4);
-        cands = cands.concat(res.map(r => ({
-          artist: r.artistName || "",
-          album:  r.collectionName || "",
-          genre:  r.primaryGenreName || "",
-          img:    r.artworkUrl100 ? r.artworkUrl100.replace("100x100","300x300") : ""
-        })));
-      }
-    }catch(e){
-      if(tesseractTimeout) clearTimeout(tesseractTimeout);
-    }
-  }
-  cands = dedupeCandidates(cands);
-  if(cands.length){ 
-    scanStatus("Select the correct match below:"); 
-    renderCandidates(cands); 
-  } else { 
-    scanStatus("Couldn't read barcode, text, or find a match. Please try again with a clearer photo, or type the details manually."); 
-  }
-}
-document.getElementById("scan-btn").addEventListener("click", () => document.getElementById("scan-input").click());
-document.getElementById("scan-input").addEventListener("change", e => { handleScan(e.target.files[0]); e.target.value = ""; });
-
-/* ---------- write helper (Apps Script: no-cors, so we confirm by refreshing) ---------- */
-function postToScript(payload){
-  return fetch(SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(payload)
-  });
 }
 
 /* ---------- add form ---------- */
@@ -731,17 +1026,17 @@ document.getElementById("add-form").addEventListener("submit", async e => {
   btn.disabled = true; btn.textContent = "Adding…"; msg.className = "formmsg";
   try{
     await postToScript({ action:"add", ...record });
-    msg.textContent = "Added! Verifying and refreshing your vault (takes a few seconds)\u2026"; msg.className = "formmsg ok";
+    msg.textContent = "Added! Verifying and refreshing your vault…"; msg.className = "formmsg ok";
     e.target.reset();
     scannedImageUrl = ""; document.getElementById("scan-results").innerHTML = ""; scanStatus("");
     setTimeout(async () => {
       await fetchSheet();
-      const exists = RECORDS.some(r => 
-        F(r, "Artist").toLowerCase() === record.Artist.toLowerCase() && 
+      const exists = RECORDS.some(r =>
+        F(r, "Artist").toLowerCase() === record.Artist.toLowerCase() &&
         F(r, "Album").toLowerCase() === record.Album.toLowerCase()
       );
       if (!exists) {
-        msg.textContent = "Record submitted, but not detected in the sheet yet. Try refreshing in a few moments.";
+        msg.textContent = "Record submitted, but not visible yet. Try refreshing in a moment.";
         msg.className = "formmsg err";
         switchTab(record.Status.toLowerCase().includes("want") ? "want" : "owned");
       } else {
@@ -750,15 +1045,15 @@ document.getElementById("add-form").addEventListener("submit", async e => {
       }
     }, 3000);
   }catch(err){
-    msg.textContent = "Couldn't reach the sheet. Check your connection and try again."; msg.className = "formmsg err";
+    msg.textContent = "Couldn't reach the sheet. Check your connection."; msg.className = "formmsg err";
   }finally{
     btn.disabled = false; btn.textContent = "Add to Vault";
   }
 });
 
 /* ---------- edit existing record ---------- */
-let editOriginal = null;   // { Artist, Album } used to locate the row
-let editImageUrl = "";     // preserve existing cover on save
+let editOriginal = null;
+let editImageUrl = "";
 function openEdit(rec){
   editOriginal = { Artist: F(rec,"Artist"), Album: F(rec,"Album") };
   editImageUrl = F(rec,"Image URL");
@@ -796,16 +1091,13 @@ document.getElementById("edit-save").addEventListener("click", async () => {
   save.disabled = true; save.textContent = "Saving…"; msg.className = "formmsg";
   try{
     await postToScript({ action:"update", key: editOriginal, record });
-    msg.textContent = "Saved! Verifying and refreshing\u2026"; msg.className = "formmsg ok";
+    msg.textContent = "Saved! Verifying and refreshing…"; msg.className = "formmsg ok";
     setTimeout(async () => {
       await fetchSheet();
-      const exists = RECORDS.some(r => 
-        F(r, "Artist").toLowerCase() === record.Artist.toLowerCase() && 
+      const exists = RECORDS.some(r =>
+        F(r, "Artist").toLowerCase() === record.Artist.toLowerCase() &&
         F(r, "Album").toLowerCase() === record.Album.toLowerCase() &&
-        F(r, "Status").toLowerCase() === record.Status.toLowerCase() &&
-        F(r, "Genre").toLowerCase() === record.Genre.toLowerCase() &&
-        F(r, "Source List").toLowerCase() === record["Source List"].toLowerCase() &&
-        (FAMILY_KEY ? F(r, FAMILY_KEY).toLowerCase() === record.For.toLowerCase() : true)
+        F(r, "Status").toLowerCase() === record.Status.toLowerCase()
       );
       if (!exists) {
         msg.textContent = "Update submitted, but changes aren't visible yet. They should sync shortly.";
@@ -824,8 +1116,16 @@ document.getElementById("edit-save").addEventListener("click", async () => {
 
 /* ---------- go ---------- */
 document.getElementById("brand-disc").innerHTML = vinyl("var(--accent)");
+document.getElementById("lock-disc").innerHTML   = vinyl("var(--accent)");
 applyThemeIcon();
-fetchSheet();
+
+// Start by checking for a saved token
+const savedToken = getSavedToken();
+if(savedToken){
+  fetchSheet();
+} else {
+  showLockScreen();
+}
 </script>
 </body>
 </html>
