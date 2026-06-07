@@ -14,7 +14,7 @@ A mobile-first vinyl record collection tracker. Single static `index.html` deplo
 | Deploy | Auto-deploys on every push to `main`. ~30s. No build step. |
 | Google Sheet ID | `1IpetK_EynQ5HLbjcEoQi_ewlkRnEi9UX__JIvw_ugZM` |
 | Sheet tab | `Collection_Master` (gid: `1619124955`) |
-| Apps Script URL | `https://script.google.com/macros/s/AKfycbwqJRWPH8KtfXrRuXxplr0IKAhI-pQos6nS56uIS9k/exec` |
+| Apps Script URL | `https://script.google.com/macros/s/AKfycbz99r2Zfu-zVCEsyfVZNjeRF70kD5fXirOPv8m4UjrvuYPbMwZb3ezztfS-3aIb2KRE/exec` |
 | Sheet sharing | "Anyone with the link can view" |
 
 ### How the data connection works
