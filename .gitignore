@@ -1,0 +1,6 @@
+agent.md
+.env
+.env.*
+*.key
+*.pem
+.gstack/
