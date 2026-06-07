@@ -2,12 +2,17 @@
  * Vinyl Vault Backend
  * Handles secure reading and writing of collection rows.
  *
- * IMPORTANT: After deploying, change the PASSCODE below to something personal.
- * Then in your Google Sheet, change sharing to "Restricted".
+ * SETUP: Set your passcode in Apps Script > Project Settings > Script Properties.
+ *   Key: PASSCODE   Value: your-chosen-passcode
+ *
  * Paste this into Extensions -> Apps Script in your Google Sheet.
  */
 
-var PASSCODE = "vinylvault2024"; // <-- CHANGE THIS to a personal passcode
+function getPasscode() {
+  var p = PropertiesService.getScriptProperties().getProperty("PASSCODE");
+  if (!p) throw new Error("PASSCODE not set. Go to Project Settings > Script Properties and add PASSCODE.");
+  return p;
+}
 
 // ============================================================
 // testAuthorization — RUN THIS ONCE FROM THE APPS SCRIPT EDITOR
@@ -16,15 +21,17 @@ var PASSCODE = "vinylvault2024"; // <-- CHANGE THIS to a personal passcode
 // ============================================================
 function testAuthorization() {
   try {
+    var passcode = getPasscode();
+    Logger.log("✅ PASSCODE property is set (length: " + passcode.length + ")");
     var sheetId = "1IpetK_EynQ5HLbjcEoQi_ewlkRnEi9UX__JIvw_ugZM";
     var ss = SpreadsheetApp.openById(sheetId);
     var sheet = ss.getSheetByName("Collection_Master");
     var lastRow = sheet.getLastRow();
     Logger.log("✅ Authorization OK. Sheet found: " + sheet.getName() + " | Rows: " + lastRow);
-    Logger.log("✅ Passcode is set to: " + PASSCODE);
   } catch(err) {
     Logger.log("❌ Authorization FAILED: " + err.toString());
-    Logger.log("   → If you see a permissions error, click 'Review Permissions' and allow access.");
+    Logger.log("   → If PASSCODE missing: Project Settings > Script Properties > Add PASSCODE.");
+    Logger.log("   → If permissions error: click 'Review Permissions' and allow access.");
   }
 }
 
@@ -34,7 +41,7 @@ function testAuthorization() {
 function doGet(e) {
   try {
     var token = (e && e.parameter && e.parameter.token) ? e.parameter.token : "";
-    if (token !== PASSCODE) {
+    if (token !== getPasscode()) {
       return ContentService.createTextOutput(JSON.stringify({ success: false, error: "Unauthorized" }))
                            .setMimeType(ContentService.MimeType.JSON);
     }
@@ -116,7 +123,7 @@ function doPost(e) {
     var data = JSON.parse(e.postData.contents);
 
     // --- Passcode check ---
-    if (!data.token || data.token !== PASSCODE) {
+    if (!data.token || data.token !== getPasscode()) {
       return ContentService.createTextOutput(JSON.stringify({ success: false, error: "Unauthorized" }))
                            .setMimeType(ContentService.MimeType.JSON);
     }
